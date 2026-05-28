@@ -1,0 +1,20 @@
+---
+import { type Lang } from "../i18n/content";
+
+interface Props {
+  lang: Lang;
+  trHref: string;
+  enHref: string;
+}
+const { lang, trHref, enHref } = Astro.props;
+---
+
+<header class="masthead">
+  <div class="wrap masthead-bar">
+    <nav class="lang mono" aria-label={lang === "tr" ? "Dil" : "Language"}>
+      <a href={trHref} aria-current={lang === "tr" ? "true" : "false"}>TR</a>
+      <span class="sep">/</span>
+      <a href={enHref} aria-current={lang === "en" ? "true" : "false"}>EN</a>
+    </nav>
+  </div>
+</header>

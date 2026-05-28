@@ -1,0 +1,54 @@
+---
+import "@fontsource-variable/schibsted-grotesk";
+import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource/ibm-plex-mono/500.css";
+import "../styles/global.css";
+import { content, type Lang } from "../i18n/content";
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  canonicalPath?: string;
+}
+const { lang, title, canonicalPath } = Astro.props;
+const t = content[lang];
+const pageTitle = title ?? t.meta.title;
+const canonical = canonicalPath
+  ? `https://piyanomini.com${canonicalPath}`
+  : lang === "tr"
+    ? "https://piyanomini.com/"
+    : "https://piyanomini.com/en/";
+---
+
+<!doctype html>
+<html lang={t.htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>{pageTitle}</title>
+    <meta name="description" content={t.meta.description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- hreflang -->
+    <link rel="alternate" hreflang="tr" href="https://piyanomini.com/" />
+    <link rel="alternate" hreflang="en" href="https://piyanomini.com/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://piyanomini.com/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={t.meta.title} />
+    <meta property="og:description" content={t.meta.description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content="https://piyanomini.com/og-image.jpg" />
+    <meta property="og:locale" content={lang === "tr" ? "tr_TR" : "en_US"} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <a href="#main" class="sr-only">{lang === "tr" ? "İçeriğe atla" : "Skip to content"}</a>
+    <slot />
+  </body>
+</html>

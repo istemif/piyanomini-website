@@ -1,0 +1,190 @@
+---
+import { content, APP_STORE_URL, CONTACT, type Lang } from "../i18n/content";
+import Masthead from "./Masthead.astro";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = content[lang];
+
+const trHref = "/";
+const enHref = "/en/";
+
+const apple =
+  "M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z";
+
+// Galeri figürleri. Gerçek SS gelince public/screenshots/ içine
+// 01.png … 04.png koy, aşağıda <img>'i aç.
+const figs = t.modules.items.slice(0, 4).map((m, i) => ({
+  no: String(i + 1).padStart(2, "0"),
+  name: m.title,
+}));
+---
+
+<!-- ============================ MASTHEAD ============================ -->
+<Masthead lang={lang} trHref={trHref} enHref={enHref} />
+
+<main id="main">
+  <!-- ============================== HERO ============================== -->
+  <section class="hero">
+    <div class="wrap hero-top">
+      <div>
+        <p class="hero-brand">Piyanomini.</p>
+        <h1>{t.hero.title}</h1>
+        <p class="intro">{t.hero.intro}</p>
+        <div class="actions">
+          <a class="cta" href={APP_STORE_URL} target="_blank" rel="noopener">
+            <svg class="apple" viewBox="0 0 384 512" aria-hidden="true"
+              ><path d={apple}></path></svg
+            >
+            {t.hero.cta}
+          </a>
+          <span class="mono muted">{t.hero.note}</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="spec mono">
+          {
+            t.spec.map((s) => (
+              <div class="row">
+                <span class="k">{s.label}</span>
+                <span class="v">{s.value}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== İÇİNDEKİLER ========================== -->
+  <section class="contents">
+    <div class="wrap">
+      <div class="sec-label mono">
+        <span class="l">{t.modules.eyebrow}</span>
+        <span>{t.modules.count}</span>
+      </div>
+      {t.modules.lead && <p class="contents-lead">{t.modules.lead}</p>}
+      {
+        t.modules.items.map((m, i) => (
+          <div class="toc-row">
+            <span class="idx">{String(i + 1).padStart(2, "0")}</span>            <div class="body">
+              <span class="name">{m.title}</span>
+              <span class="desc">{m.desc}</span>
+            </div>
+            <span class="meta mono">{m.meta}</span>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ============================= ARAÇLAR =========================== -->
+  <section class="contents">
+    <div class="wrap">
+      <div class="sec-label mono">
+        <span class="l">{t.tools.eyebrow}</span>
+        <span>{t.tools.count}</span>
+      </div>
+      {
+        t.tools.items.map((m, i) => (
+          <div class="toc-row">
+            <span class="idx">{String(i + 1).padStart(2, "0")}</span>            <div class="body">
+              <span class="name">{m.title}</span>
+              <span class="desc">{m.desc}</span>
+            </div>
+            <span class="meta mono">{m.meta}</span>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ============================= GALERİ ============================= -->
+  <section class="gallery">
+    <div class="wrap">
+      <div class="sec-label mono">
+        <span class="l">{t.screens.eyebrow}</span>
+        <span>{t.screens.heading}</span>
+      </div>
+      <div class="gallery-grid">
+        {
+          figs.map((f) => (
+            <figure class="figure">
+              <div class="frame">
+                <div class="ph mono">{f.no}.mp4</div>
+                {/* public/screenshots/NN.mp4 koyunca otomatik oynar; yoksa placeholder kalır. */}
+                <video autoplay loop muted playsinline disablepictureinpicture preload="metadata" aria-label={f.name}>
+                  <source src={`/screenshots/${f.no}.mp4`} type="video/mp4" onerror="this.parentElement.remove()" />
+                </video>
+              </div>
+              <figcaption class="mono">
+                <span>Fig. {f.no}</span>
+                <span>{f.name}</span>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ İLKELER ============================= -->
+  <section class="principles">
+    <div class="wrap">
+      <div class="sec-label mono">
+        <span class="l">{t.principles.eyebrow}</span>
+        <span>{t.principles.note}</span>
+      </div>
+      <div class="principles-lead">
+        <h2>{t.principles.heading}</h2>
+        <p>{t.principles.intro}</p>
+      </div>
+      <div class="principles-grid">
+        {
+          t.principles.items.map((p, i) => (
+            <div class="principle">
+              <span class="pno mono">0{i + 1}</span>
+              <h3>{p.title}</h3>
+              <p>{p.desc}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================== COLOPHON ============================ -->
+  <footer class="colophon">
+    <div class="wrap">
+      <div class="colophon-grid">
+        <div>
+          <span class="col-label mono">Piyanomini</span>
+          <span class="row">{t.footer.tagline}</span>
+        </div>
+        <div>
+          <span class="col-label mono">{t.footer.contactLabel}</span>
+          <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+          <a href={CONTACT.instagram} target="_blank" rel="noopener">{CONTACT.instagramHandle}</a>
+        </div>
+        <div>
+          <span class="col-label mono">{t.footer.siteLabel}</span>
+          <a href={APP_STORE_URL} target="_blank" rel="noopener">App Store</a>
+          <a href={lang === "tr" ? enHref : trHref}>{lang === "tr" ? "English" : "Türkçe"}</a>
+        </div>
+        <div>
+          <span class="col-label mono">{lang === "tr" ? "Yasal" : "Legal"}</span>
+          <a href={lang === "en" ? "/en/privacy" : "/privacy"}>{t.footer.privacy}</a>
+          <a href={lang === "en" ? "/en/terms" : "/terms"}>{t.footer.terms}</a>
+        </div>
+      </div>
+
+      <div class="colophon-bottom mono">
+        <span>© {new Date().getFullYear()} Piyanomini. {t.footer.rights}</span>
+        <span>Talas · Kayseri</span>
+      </div>
+    </div>
+  </footer>
+</main>

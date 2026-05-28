@@ -1,0 +1,38 @@
+---
+import Base from "../layouts/Base.astro";
+import Masthead from "./Masthead.astro";
+import { content, CONTACT, type Lang } from "../i18n/content";
+
+interface Props {
+  lang: Lang;
+  kind: "privacy" | "terms";
+}
+const { lang, kind } = Astro.props;
+
+const doc = content[lang].legal[kind];
+const trHref = kind === "privacy" ? "/privacy" : "/terms";
+const enHref = kind === "privacy" ? "/en/privacy" : "/en/terms";
+const canonicalPath = lang === "tr" ? trHref : enHref;
+const mail = `mailto:${CONTACT.email}`;
+---
+
+<Base lang={lang} title={doc.titleTag} canonicalPath={canonicalPath}>
+  <Masthead lang={lang} trHref={trHref} enHref={enHref} />
+
+  <main id="main" class="wrap legal">
+    <span class="mono muted">{doc.eyebrow}</span>
+    <h1>{doc.title}</h1>
+    <span class="updated mono">{doc.updated}</span>
+    <p class="lead">{doc.lead}</p>
+    {
+      doc.sections.map((s) => (
+        <Fragment>
+          <h2>{s.h}</h2>
+          <p>{s.p}</p>
+        </Fragment>
+      ))
+    }
+    <h2>{doc.contactHeading}</h2>
+    <p>{doc.contactText} <a class="inline" href={mail}>{CONTACT.email}</a></p>
+  </main>
+</Base>
