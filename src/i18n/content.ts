@@ -79,13 +79,9 @@ export const content: Record<Lang, Strings> = {
     },
     spec: [
       { label: "Tasarımcı", value: "Müzik öğretmeni" },
-      { label: "Platform", value: "iOS" },
-      { label: "Modül", value: "06" },
-      { label: "Araç", value: "05" },
-      { label: "Egzersiz", value: "25+ çeşit · sınırsız" },
-      { label: "Deneme", value: "14 gün, tuzaksız" },
-      { label: "Fiyat", value: "800₺, tek seferlik" },
-      { label: "Dil", value: "TR / EN" },
+      { label: "Kapsam", value: "6 modül · 5 araç · 25+ egzersiz türü" },
+      { label: "Deneme", value: "14 gün · tuzaksız" },
+      { label: "Fiyat", value: "800₺ · tek seferlik" },
     ],
     modules: {
       eyebrow: "İçindekiler",
@@ -197,13 +193,9 @@ export const content: Record<Lang, Strings> = {
     },
     spec: [
       { label: "Designed by", value: "A music teacher" },
-      { label: "Platform", value: "iOS" },
-      { label: "Modules", value: "06" },
-      { label: "Tools", value: "05" },
-      { label: "Exercises", value: "25+ types · endless" },
-      { label: "Trial", value: "14 days, no gimmicks" },
-      { label: "Price", value: "$25, one-time" },
-      { label: "Language", value: "TR / EN" },
+      { label: "Scope", value: "6 modules · 5 tools · 25+ exercise types" },
+      { label: "Trial", value: "14 days · no gimmicks" },
+      { label: "Price", value: "$25 · one-time" },
     ],
     modules: {
       eyebrow: "Contents",
