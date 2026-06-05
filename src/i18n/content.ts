@@ -7,7 +7,7 @@
 export const APP_STORE_URL = "https://apps.apple.com/app/piyanomini/id000000000";
 
 export const CONTACT = {
-  email: "istemifurkan@gmail.com",
+  email: "hello@istemifurkan.com",
   instagram: "https://www.instagram.com/piyanomini/",
   instagramHandle: "@piyanomini",
   twitter: "https://x.com/piyanomini",
