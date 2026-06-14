@@ -6,11 +6,11 @@
    ============================================================ */
 
 :root {
-  --bg: #ffffff;
-  --fg: #111111;
-  --rule: #111111; /* güçlü hairline */
-  --line: #e2e2e2; /* yumuşak satır ayracı */
-  --muted: #8a8a8a;
+  --bg: #fcfbf7; /* fildişi "nota kağıdı" — saf beyaz yerine */
+  --fg: #16140e; /* sıcak mürekkep siyahı */
+  --rule: #16140e; /* güçlü hairline */
+  --line: #e2dfd6; /* yumuşak satır ayracı (sıcak) */
+  --muted: #8a857a;
 
   --sans: "Schibsted Grotesk Variable", "Helvetica Neue", Arial, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
