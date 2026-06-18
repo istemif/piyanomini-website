@@ -68,13 +68,24 @@ const figs = t.modules.items.slice(0, 4).map((m, i) => ({
       </div>
       {t.modules.lead && <p class="contents-lead">{t.modules.lead}</p>}
       {
-        t.modules.items.map((m, i) => (
-          <div class="toc-row">
-            <span class="idx">{String(i + 1).padStart(2, "0")}</span>            <div class="body">
-              <span class="name">{m.title}</span>
-              <span class="desc">{m.desc}</span>
+        t.modules.items.map((cat, i) => (
+          <div class="cat">
+            <div class="cat-head">
+              <span class="idx">{String(i + 1).padStart(2, "0")}</span>
+              <div class="cat-title">
+                <span class="name">{cat.title}</span>
+                <span class="cat-tag mono">{cat.tagline}</span>
+              </div>
+              <span class="meta mono">{cat.count}</span>
             </div>
-            <span class="meta mono">{m.meta}</span>
+            <p class="cat-list">
+              {cat.items.map((ex, j) => (
+                <Fragment>
+                  {j > 0 && <span class="sep"> · </span>}
+                  <span class="ex">{ex}</span>
+                </Fragment>
+              ))}
+            </p>
           </div>
         ))
       }

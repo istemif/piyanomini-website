@@ -18,6 +18,7 @@ export const CONTACT = {
 export type Lang = "tr" | "en";
 
 type Module = { code: string; title: string; desc: string; meta: string };
+type Category = { title: string; tagline: string; count: string; items: string[] };
 type KV = { label: string; value: string };
 type LegalDoc = {
   eyebrow: string;
@@ -37,7 +38,7 @@ type Strings = {
   nav: { download: string };
   hero: { title: string; intro: string; cta: string; note: string };
   spec: KV[];
-  modules: { eyebrow: string; count: string; lead?: string; items: Module[] };
+  modules: { eyebrow: string; count: string; lead?: string; items: Category[] };
   tools: { eyebrow: string; count: string; items: Module[] };
   screens: { eyebrow: string; heading: string };
   principles: {
@@ -66,35 +67,61 @@ export const content: Record<Lang, Strings> = {
     meta: {
       title: "Piyanomini: Müzisyenin İsviçre çakısı",
       description:
-        "Ritim, teori, işitme, vokal, armoni ve karşı ezgi. Müzik kulağınızı ve teorinizi tek uygulamada geliştirin. Hesap yok, veri yok.",
+        "Okuma, teori, işitme ve vokal — armoni, kontrpuan ve dikte dahil. Müzik kulağınızı ve teorinizi tek uygulamada geliştirin. Hesap yok, veri yok.",
     },
     edition: "Müzik Eğitimi · iOS",
     nav: { download: "App Store" },
     hero: {
       title: "Müzisyenin İsviçre çakısı.",
       intro:
-        "Teori, işitme, ritim, vokal, armoni ve kontrpuan tek uygulamada. Piyanomini; kendiliğinden üretilen egzersizler, gerçek nota yazımı, tuner, metronom ve çalışma kaydıyla müzik pratiğini düzenli ve derli toplu hale getirir.",
+        "Okuma, teori, işitme ve vokal tek uygulamada — armoni ve kontrpuan dahil. Piyanomini; kendiliğinden üretilen alıştırmalar, gerçek nota yazımı, tuner, metronom ve çalışma kaydıyla müzik pratiğini düzenli ve derli toplu hale getirir.",
       cta: "App Store'dan indir",
       note: "iOS için · 14 gün tam deneme · kart tuzağı yok",
     },
     spec: [
       { label: "Tasarımcı", value: "Müzik öğretmeni" },
-      { label: "Kapsam", value: "6 modül · 5 araç · 30+ egzersiz türü" },
+      { label: "Kapsam", value: "4 bölüm · 5 araç · 28 alıştırma" },
       { label: "Deneme", value: "14 gün · tuzaksız" },
       { label: "Fiyat", value: "999,99₺ · tek seferlik" },
       { label: "Aile Paylaşımı", value: "6 kişiye kadar" },
     ],
     modules: {
       eyebrow: "İçindekiler",
-      count: "06 Modül",
-      lead: "Piyanomini, normalde ayrı ayrı aranan çalışma alanlarını tek yerde toplar. Ritim, teori, işitme ve vokalin yanında; kurallı SATB armonisi, tür kontrpuanı, kendiliğinden üretilen melodik ve ritmik dikte, C anahtarlarıyla deşifre okuma gibi App Store'da doğrudan karşılığı zor bulunan çalışmalar içerir.",
+      count: "04 Bölüm",
+      lead: "Piyanomini, normalde ayrı ayrı aranan çalışma alanlarını tek yerde toplar — okuma, teori, işitme ve vokal. Kurallı SATB armonisi, tür kontrpuanı, kendiliğinden üretilen melodik ve ritmik dikte, C anahtarlarıyla deşifre okuma gibi App Store'da doğrudan karşılığı zor bulunan çalışmalar içerir.",
       items: [
-        { code: "RİT", title: "Ritim", desc: "Notada gördüğünüz ritmi doğru zamanda çalın; ritmik sight-reading becerinizi ve zamanlama duygunuzu geliştirin.", meta: "Ritim oyunu" },
-        { code: "TEO", title: "Teori", desc: "Tuş bulma, nota okuma, ton bulma ve kurma, dizi tanıma, aralık tanıma ve kurma, akor tanıma ve akor dereceleri.", meta: "9 egzersiz" },
-        { code: "İŞT", title: "İşitme", desc: "Ritim tekrarı, ezgi yönü, nota duyma, aralık duyma ve aralık kıyası, akor ve derece duyma, dizi duyma, melodik ve ritmik dikte, duy-söyle, deşifre solfej ve deşifre çalma.", meta: "13 egzersiz" },
-        { code: "VOK", title: "Vokal", desc: "Dizi, arpej ve aralıkları sesinizle söyleyin; entonasyonunuz gerçek zamanlı izlenir.", meta: "3 egzersiz" },
-        { code: "ARM", title: "Armoni", desc: "Kurallarına uygun SATB dört ses armonizasyonu; alıştırmalar sınırsızca üretilir.", meta: "SATB · 4 ses" },
-        { code: "KAR", title: "Kontrpuan", desc: "Birinciden beşinci türe kadar karşı ezgi çalışın; cantus firmus kendiliğinden üretilir.", meta: "5 tür" },
+        {
+          title: "Okuma",
+          tagline: "Deşifre & akıcılık",
+          count: "3 alıştırma",
+          items: ["Ritim", "Deşifre Çalma", "Deşifre Solfej"],
+        },
+        {
+          title: "Teori",
+          tagline: "Analiz & kompozisyon",
+          count: "11 alıştırma",
+          items: [
+            "Tuş Bulma", "Nota Okuma", "Ton Bulma", "Ton Kurma",
+            "Dizi Tanıma", "Aralık Tanıma", "Aralık Kurma",
+            "Akor Tanıma", "Akor Derecesi", "Armoni", "Karşı Ezgi",
+          ],
+        },
+        {
+          title: "İşitme",
+          tagline: "Kulaktan tanıma",
+          count: "11 alıştırma",
+          items: [
+            "Ritim Tekrarı", "Yön Tahmini", "Nota Duyma", "Aralık Duyma",
+            "Aralık Kıyası", "Akor Duyma", "Derece Duyma", "Dizi Duyma",
+            "Melodi Dikte", "Duy ve Söyle", "Ritim Diktesi",
+          ],
+        },
+        {
+          title: "Vokal",
+          tagline: "Entonasyon",
+          count: "3 alıştırma",
+          items: ["Dizi", "Aralık", "Arpej"],
+        },
       ],
     },
     tools: {
@@ -182,35 +209,61 @@ export const content: Record<Lang, Strings> = {
     meta: {
       title: "Piyanomini: A musician's Swiss army knife",
       description:
-        "Rhythm, theory, ear training, vocal, harmony and counterpoint. Ear training and theory in one app. No account, no data.",
+        "Reading, theory, ear training and vocal — harmony, counterpoint and dictation included. Ear training and theory in one app. No account, no data.",
     },
     edition: "Music Education · iOS",
     nav: { download: "App Store" },
     hero: {
       title: "A musician's Swiss army knife.",
       intro:
-        "Theory, ear training, rhythm, vocal practice, harmony and counterpoint in one app. Piyanomini brings auto-generated exercises, real notation, a tuner, metronome and practice log into one focused practice system.",
+        "Reading, theory, ear training and vocal practice in one app — harmony and counterpoint included. Piyanomini brings auto-generated exercises, real notation, a tuner, metronome and practice log into one focused practice system.",
       cta: "Download on the App Store",
       note: "for iOS · 14-day full trial · no surprise charge",
     },
     spec: [
       { label: "Designed by", value: "A music teacher" },
-      { label: "Scope", value: "6 modules · 5 tools · 30+ exercise types" },
+      { label: "Scope", value: "4 parts · 5 tools · 28 exercises" },
       { label: "Trial", value: "14 days · no gimmicks" },
       { label: "Price", value: "$19.99 · one-time" },
       { label: "Family Sharing", value: "Up to 6 people" },
     ],
     modules: {
       eyebrow: "Contents",
-      count: "06 Modules",
-      lead: "Piyanomini brings together study areas musicians usually look for separately. Alongside rhythm, theory, ear training and vocal practice, it includes work that's hard to find direct equivalents for on the App Store: rule-checked SATB harmony, species counterpoint, auto-generated melodic and rhythmic dictation, and sight-reading in C clefs.",
+      count: "04 Parts",
+      lead: "Piyanomini brings together study areas musicians usually look for separately — reading, theory, ear training and vocal practice. It includes work that's hard to find direct equivalents for on the App Store: rule-checked SATB harmony, species counterpoint, auto-generated melodic and rhythmic dictation, and sight-reading in C clefs.",
       items: [
-        { code: "RHY", title: "Rhythm", desc: "Play the rhythm you see with the right timing to build rhythmic sight-reading and a steadier sense of time.", meta: "Rhythm game" },
-        { code: "THE", title: "Theory", desc: "Key finder, note reading, key identification and construction, scale recognition, interval recognition and construction, chord recognition and chord degrees.", meta: "9 exercises" },
-        { code: "EAR", title: "Ear", desc: "Rhythm repeat, pitch direction, perfect pitch, interval hearing and interval-size comparison, chord and degree hearing, scale hearing, melodic and rhythmic dictation, sing-back, sight-singing and sight-reading.", meta: "13 exercises" },
-        { code: "VOC", title: "Vocal", desc: "Sing scales, arpeggios and intervals while your intonation is tracked in real time.", meta: "3 exercises" },
-        { code: "HAR", title: "Harmony", desc: "Rule-checked SATB four-part harmonization; exercises are generated endlessly.", meta: "SATB · 4 voices" },
-        { code: "CTP", title: "Counterpoint", desc: "Practice first through fifth species counterpoint; the cantus firmus is auto-generated.", meta: "5 species" },
+        {
+          title: "Reading",
+          tagline: "Sight & fluency",
+          count: "3 exercises",
+          items: ["Rhythm", "Sight-Reading", "Sight-Singing"],
+        },
+        {
+          title: "Theory",
+          tagline: "Analysis & composition",
+          count: "11 exercises",
+          items: [
+            "Key Finder", "Note Reading", "Key Identification", "Key Construction",
+            "Scale Recognition", "Interval Recognition", "Interval Construction",
+            "Chord Recognition", "Chord Degrees", "Harmony", "Counterpoint",
+          ],
+        },
+        {
+          title: "Ear",
+          tagline: "By ear",
+          count: "11 exercises",
+          items: [
+            "Rhythm Repeat", "Pitch Direction", "Perfect Pitch", "Interval Hearing",
+            "Interval Sizes", "Chord Hearing", "Chord Degrees", "Scale Hearing",
+            "Melody Dictation", "Sing Back", "Rhythm Dictation",
+          ],
+        },
+        {
+          title: "Vocal",
+          tagline: "Intonation",
+          count: "3 exercises",
+          items: ["Scale", "Interval", "Arpeggio"],
+        },
       ],
     },
     tools: {
