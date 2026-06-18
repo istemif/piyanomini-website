@@ -1,0 +1,109 @@
+---
+// Ödev landing sayfası — YALNIZ uygulama yüklü DEĞİLKEN görünür.
+// (Yüklüyse universal link iOS tarafından yakalanır, app açılır, bu sayfa hiç yüklenmez.)
+// Tamamen statik: payload URL'in `?d=` query'sinde; çözme client-side, sunucu yok.
+const scheme = "piyanomini"; // custom scheme fallback (piyanomini://a?d=…)
+---
+
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Piyanomini · Ödev</title>
+    <style>
+      :root { color-scheme: light dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100svh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        color: #111;
+        font-family: "IBM Plex Sans", -apple-system, system-ui, sans-serif;
+        padding: 32px;
+      }
+      @media (prefers-color-scheme: dark) {
+        body { background: #111; color: #f4f4f4; }
+        .btn-secondary { color: #f4f4f4; }
+      }
+      main { width: 100%; max-width: 420px; text-align: center; }
+      .brand { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; opacity: .5; font-family: "IBM Plex Mono", ui-monospace, monospace; }
+      h1 { font-size: 28px; font-weight: 600; margin: 14px 0 6px; }
+      .module { font-size: 15px; opacity: .7; margin: 0 0 2px; }
+      .note { font-size: 14px; opacity: .55; margin: 10px 0 0; }
+      .rule { height: 1.5px; background: currentColor; opacity: .9; margin: 28px 0; }
+      .btn {
+        display: block; width: 100%; padding: 16px; font-size: 16px;
+        text-decoration: none; border: none; cursor: pointer;
+        font-family: inherit;
+      }
+      .btn-primary { background: #111; color: #fff; }
+      @media (prefers-color-scheme: dark) { .btn-primary { background: #f4f4f4; color: #111; } }
+      .btn-secondary { background: transparent; color: #111; opacity: .6; margin-top: 8px; font-size: 14px; }
+      .hint { font-size: 12px; opacity: .45; margin-top: 22px; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="brand">Piyanomini</p>
+      <h1 id="title">Bir ödev paylaşıldı</h1>
+      <p class="module" id="module"></p>
+      <p class="note" id="note"></p>
+
+      <div class="rule"></div>
+
+      <a class="btn btn-primary" id="open" href="#">Uygulamada aç</a>
+      <a class="btn btn-secondary" href="/">Piyanomini nedir?</a>
+
+      <p class="hint" id="hint">
+        Açılmadıysa Piyanomini yüklü değil demektir. Uygulamayı yükledikten sonra bu bağlantıya yeniden dokun.
+      </p>
+    </main>
+
+    <script define:vars={{ scheme }}>
+      // base64url → metin
+      function b64urlDecode(s) {
+        s = s.replace(/-/g, "+").replace(/_/g, "/");
+        while (s.length % 4) s += "=";
+        return decodeURIComponent(
+          atob(s).split("").map(c => "%" + c.charCodeAt(0).toString(16).padStart(2, "0")).join("")
+        );
+      }
+
+      const TR = navigator.language?.toLowerCase().startsWith("tr") ?? true;
+      const MODULE_NAMES = {
+        earInterval: TR ? "Aralık Duyma" : "Ear Training · Intervals",
+      };
+
+      const params = new URLSearchParams(location.search);
+      const d = params.get("d");
+
+      // i18n metinleri
+      if (!TR) {
+        document.documentElement.lang = "en";
+        document.getElementById("title").textContent = "An assignment was shared";
+        document.getElementById("open").textContent = "Open in app";
+        document.querySelector(".btn-secondary").textContent = "What is Piyanomini?";
+        document.getElementById("hint").textContent =
+          "If nothing opened, Piyanomini isn't installed. Install the app, then tap this link again.";
+      }
+
+      // Custom scheme fallback: app yüklüyse bu da açar (universal link tutmazsa).
+      if (d) {
+        document.getElementById("open").href = `${scheme}://a?d=${encodeURIComponent(d)}`;
+        try {
+          const env = JSON.parse(b64urlDecode(d));
+          const name = MODULE_NAMES[env.module];
+          if (name) document.getElementById("module").textContent = name;
+          if (env.note) document.getElementById("note").textContent = env.note;
+        } catch (_) { /* bozuk payload → sadece genel metin kalır */ }
+      } else {
+        document.getElementById("open").style.display = "none";
+      }
+    </script>
+  </body>
+</html>

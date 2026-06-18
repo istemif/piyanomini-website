@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["4K6RAZ3S5A.com.piyanomini.app"],
+        "components": [
+          { "/": "/a", "?": { "d": "?*" }, "comment": "odev paylasim linki" },
+          { "/": "/a/*", "comment": "odev paylasim linki (alt yol)" }
+        ]
+      }
+    ]
+  }
+}
