@@ -32,8 +32,33 @@ const canonical = canonicalPath
     />
     <title>{pageTitle}</title>
     <meta name="description" content={t.meta.description} />
+
+    <!-- Dil tercihini hatırla. Çerez = son seçilen dil; çıplak domain (/) bu
+         çereze bakarak son seçilen dili açar (vercel.json).
+         - Sayfa yüklenince çerezi bu sayfanın diline yazar (doğrudan giriş / yer imi).
+         - Bir bağlantıya tıklanınca, gidilecek sayfanın diline göre çerezi tıklama
+           anında günceller; böylece değer-duyarlı yönlendirme TR/EN linkini geri sektirmez. -->
+    <script is:inline define:vars={{ lang }}>
+      (function () {
+        var ATTRS = "; path=/; max-age=31536000; samesite=lax";
+        document.cookie = "pref-lang=" + lang + ATTRS;
+        document.addEventListener(
+          "click",
+          function (e) {
+            var a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
+            if (!a) return;
+            var url;
+            try { url = new URL(a.href, location.href); } catch (_) { return; }
+            if (url.origin !== location.origin) return;
+            var en = url.pathname === "/en" || url.pathname.indexOf("/en/") === 0;
+            document.cookie = "pref-lang=" + (en ? "en" : "tr") + ATTRS;
+          },
+          true
+        );
+      })();
+    </script>
     <link rel="canonical" href={canonical} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#fcfbf7" />
 
@@ -47,9 +72,12 @@ const canonical = canonicalPath
     <meta property="og:title" content={t.meta.title} />
     <meta property="og:description" content={t.meta.description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content="https://piyanomini.com/og-image.jpg" />
+    <meta property="og:image" content="https://piyanomini.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1024" />
+    <meta property="og:image:height" content="1024" />
     <meta property="og:locale" content={lang === "tr" ? "tr_TR" : "en_US"} />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" content="https://piyanomini.vercel.app/og-image.png" />
   </head>
   <body>
     <a href="#main" class="sr-only">{lang === "tr" ? "İçeriğe atla" : "Skip to content"}</a>
