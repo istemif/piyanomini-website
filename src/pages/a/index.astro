@@ -12,6 +12,16 @@ const scheme = "piyanomini"; // custom scheme fallback (piyanomini://a?d=…)
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <title>Piyanomini · Ödev</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Piyanomini · Ödev" />
+    <meta property="og:description" content="Öğretmeninin paylaştığı alıştırma — Piyanomini'de aç." />
+    <meta property="og:image" content="https://piyanomini.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1024" />
+    <meta property="og:image:height" content="1024" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" content="https://piyanomini.vercel.app/og-image.png" />
     <style>
       :root { color-scheme: light dark; }
       * { box-sizing: border-box; }
@@ -65,22 +75,10 @@ const scheme = "piyanomini"; // custom scheme fallback (piyanomini://a?d=…)
     </main>
 
     <script define:vars={{ scheme }}>
-      // base64url → metin
-      function b64urlDecode(s) {
-        s = s.replace(/-/g, "+").replace(/_/g, "/");
-        while (s.length % 4) s += "=";
-        return decodeURIComponent(
-          atob(s).split("").map(c => "%" + c.charCodeAt(0).toString(16).padStart(2, "0")).join("")
-        );
-      }
-
       const TR = navigator.language?.toLowerCase().startsWith("tr") ?? true;
-      const MODULE_NAMES = {
-        earInterval: TR ? "Aralık Duyma" : "Ear Training · Intervals",
-      };
-
       const params = new URLSearchParams(location.search);
       const d = params.get("d");
+      const note = params.get("n");
 
       // i18n metinleri
       if (!TR) {
@@ -94,16 +92,12 @@ const scheme = "piyanomini"; // custom scheme fallback (piyanomini://a?d=…)
 
       // Custom scheme fallback: app yüklüyse bu da açar (universal link tutmazsa).
       if (d) {
+        // d artık tek base64url (deflate) blok — modül adını burada çözmüyoruz (app çözer).
         document.getElementById("open").href = `${scheme}://a?d=${encodeURIComponent(d)}`;
-        try {
-          const env = JSON.parse(b64urlDecode(d));
-          const name = MODULE_NAMES[env.module];
-          if (name) document.getElementById("module").textContent = name;
-          if (env.note) document.getElementById("note").textContent = env.note;
-        } catch (_) { /* bozuk payload → sadece genel metin kalır */ }
       } else {
         document.getElementById("open").style.display = "none";
       }
+      if (note) document.getElementById("note").textContent = note;
     </script>
   </body>
 </html>

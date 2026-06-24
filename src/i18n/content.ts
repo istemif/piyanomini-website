@@ -82,7 +82,7 @@ export const content: Record<Lang, Strings> = {
       { label: "Tasarımcı", value: "Müzik öğretmeni" },
       { label: "Kapsam", value: "4 bölüm · 5 araç · 28 alıştırma" },
       { label: "Deneme", value: "14 gün · tuzaksız" },
-      { label: "Fiyat", value: "999,99₺ · tek seferlik" },
+      { label: "Fiyat", value: "1.299,99₺ · tek seferlik" },
       { label: "Aile Paylaşımı", value: "6 kişiye kadar" },
     ],
     modules: {
@@ -128,7 +128,7 @@ export const content: Record<Lang, Strings> = {
       eyebrow: "Araçlar",
       count: "05 Araç",
       items: [
-        { code: "TUN", title: "Tuner", desc: "Kromatik tuner; strobe, helix ve grafik görünümleriyle perdeyi hassas izleyin.", meta: "Strobe · Helix · Grafik" },
+        { code: "TUN", title: "Tuner", desc: "Kromatik tuner; strobe ve grafik görünümleriyle perdeyi hassas izleyin.", meta: "Strobe · Grafik" },
         { code: "MET", title: "Metronom", desc: "Tiklerini nota değerleriyle programlayın; noktalı notalar, trioleler ve konuşan sayım kullanın.", meta: "Programlanabilir tikler" },
         { code: "ZAM", title: "Zamanlayıcı", desc: "Serbest ya da geri sayımlı çalışın; günlük hedefinizi ve oturum sürenizi takip edin.", meta: "Hedef · Geri sayım" },
         { code: "HAT", title: "Hatırlatıcı", desc: "Seçtiğiniz gün ve saatte çalışma bildirimi alın; istediğiniz zaman değiştirin veya kapatın.", meta: "Gün · Saat" },
@@ -224,7 +224,7 @@ export const content: Record<Lang, Strings> = {
       { label: "Designed by", value: "A music teacher" },
       { label: "Scope", value: "4 parts · 5 tools · 28 exercises" },
       { label: "Trial", value: "14 days · no gimmicks" },
-      { label: "Price", value: "$19.99 · one-time" },
+      { label: "Price", value: "$24.99 · one-time" },
       { label: "Family Sharing", value: "Up to 6 people" },
     ],
     modules: {
@@ -270,7 +270,7 @@ export const content: Record<Lang, Strings> = {
       eyebrow: "Tools",
       count: "05 Tools",
       items: [
-        { code: "TUN", title: "Tuner", desc: "Chromatic tuner with strobe, helix and graph views for precise pitch tracking.", meta: "Strobe · Helix · Graph" },
+        { code: "TUN", title: "Tuner", desc: "Chromatic tuner with strobe and graph views for precise pitch tracking.", meta: "Strobe · Graph" },
         { code: "MET", title: "Metronome", desc: "Program clicks with note values; use dotted notes, triplets and spoken beat counting.", meta: "Programmable clicks" },
         { code: "TMR", title: "Timer", desc: "Practice freely or with a countdown; track your daily goal and session time.", meta: "Goal · Countdown" },
         { code: "RMD", title: "Reminders", desc: "Get practice notifications on the days and times you choose; change or turn them off anytime.", meta: "Day · Time" },

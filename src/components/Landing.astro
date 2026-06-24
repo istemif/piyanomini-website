@@ -16,10 +16,15 @@ const apple =
 
 // Galeri figürleri. Gerçek SS gelince public/screenshots/ içine
 // 01.png … 04.png koy, aşağıda <img>'i aç.
-const figs = t.modules.items.slice(0, 4).map((m, i) => ({
-  no: String(i + 1).padStart(2, "0"),
-  name: m.title,
-}));
+const figs = t.modules.items.slice(0, 4).map((m, i) => {
+  const no = String(i + 1).padStart(2, "0");
+  // Teori (02) videosu dile özel: TR=02.1, EN=02.2. Diğerleri ortak.
+  const file = no === "02" ? (lang === "tr" ? "02.1.mp4" : "02.2.mp4") : `${no}.mp4`;
+  return { no, name: m.title, file };
+});
+
+// Ekran videoları (public/screenshots/*.mp4) hazır olana kadar galeri gizli.
+const showGallery = false;
 ---
 
 <!-- ============================ MASTHEAD ============================ -->
@@ -114,6 +119,7 @@ const figs = t.modules.items.slice(0, 4).map((m, i) => ({
   </section>
 
   <!-- ============================= GALERİ ============================= -->
+  {showGallery && (
   <section class="gallery">
     <div class="wrap">
       <div class="sec-label mono">
@@ -125,10 +131,10 @@ const figs = t.modules.items.slice(0, 4).map((m, i) => ({
           figs.map((f) => (
             <figure class="figure">
               <div class="frame">
-                <div class="ph mono">{f.no}.mp4</div>
+                <div class="ph mono">{f.file}</div>
                 {/* public/screenshots/NN.mp4 koyunca otomatik oynar; yoksa placeholder kalır. */}
                 <video autoplay loop muted playsinline disablepictureinpicture preload="metadata" aria-label={f.name}>
-                  <source src={`/screenshots/${f.no}.mp4`} type="video/mp4" onerror="this.parentElement.remove()" />
+                  <source src={`/screenshots/${f.file}`} type="video/mp4" onerror="this.parentElement.remove()" />
                 </video>
               </div>
               <figcaption class="mono">
@@ -141,6 +147,7 @@ const figs = t.modules.items.slice(0, 4).map((m, i) => ({
       </div>
     </div>
   </section>
+  )}
 
   <!-- ============================ İLKELER ============================= -->
   <section class="principles">
