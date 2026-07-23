@@ -64,6 +64,8 @@ type Strings = {
     intro: string;
     availability: string;
     chapters: Category[];
+    principlesHeading: string;
+    principlesIntro: string;
     features: Feature[];
   };
   screens: { eyebrow: string; heading: string };
@@ -256,11 +258,15 @@ export const content: Record<Lang, Strings> = {
           items: ["Çalınabilir Örnekler", "Ritim Oyunları", "Üretilen Çalışma Sayfaları", "Dinlenebilir Notalar"],
         },
       ],
+      principlesHeading: "Kitabın farkı, daha ilk seste başlar.",
+      principlesIntro: "Manus hızlı sonuç görüntüsü üretmek yerine sağlam bir müzikal temel kurar. Ses, okuma, teknik ve ifade birbirinden ayrılmaz; her yeni beceri öğrenciyi kendi başına müzik çözmeye biraz daha yaklaştırır.",
       features: [
-        { title: "Doğrusal öğrenme", desc: "Konular bir kez pedagojik sıraya konur. Öğrenci menüler arasında kaybolmadan sayfa sayfa ilerler; uygulama kaldığı yeri hatırlar.", meta: "Kaydır · Devam et" },
-        { title: "Sayfanın içinde müzik", desc: "Piyano tuşları, ritim şeritleri ve nota örnekleri doğrudan sayfanın parçasıdır. Öğrenci okurken dinler, dokunur ve çalar.", meta: "Dokun · Dinle · Çal" },
-        { title: "Yazma ve çalışma sayfaları", desc: "Boş ve notalı PDF sayfaları her üretimde yeni ritimler getirir; öğretmen derste kullanabilir, öğrenci evde aynı sayfayı sürdürebilir.", meta: "PDF · Yazdır · Paylaş" },
-        { title: "Gerçek nota motoru", desc: "Manus; çok sesli notaları, bağları, artikülasyonları, parmak numaralarını ve dinamikleri okuyup çalabilen kendi notasyon altyapısını kullanır.", meta: "MusicXML · Seslendirme" },
+        { title: "Önce ses", desc: "İlk notalar dengeli bir parmak ve serbest kol ağırlığıyla, birbirinden ayrı üretilir. Amaç hemen çok nota çalmak değil; gerginliksiz, dolgun ve dinlenmiş bir ses kurmaktır.", meta: "Ağırlık · Denge · Ton" },
+        { title: "Klavye bir bütündür", desc: "El aylarca beş komşu tuşa kapatılmaz. Öğrenci en baştan klavyede dolaşır; notayı sabit el pozisyonu ya da parmak numarasıyla karıştırmaz.", meta: "Konum değil · Coğrafya" },
+        { title: "Okuma gerçekten okumadır", desc: "Müzik yazısı ilk derslerden itibaren yatay ve dikey iki eksen olarak ele alınır. Öğrenci işareti görür, sesi düşünür ve klavyedeki yerini bağımsızca bulur.", meta: "Gör · Düşün · Bul" },
+        { title: "İfade sona bırakılmaz", desc: "Bağlı, bağsız ve kısa çalma biçimleri; nüanslar ve müzikal karakter daha başlangıç repertuvarında yer alır. Doğru tuş kadar, sesin nasıl söylendiği de önemlidir.", meta: "Artikülasyon · Nüans" },
+        { title: "Teknik, müziğin aracıdır", desc: "Hareketler soyut parmak jimnastiği olarak değil, istenen sesi ve karakteri üretmek için öğrenilir. Teknik, dinleme ve müzikal imgeyle birlikte gelişir.", meta: "Hareket → Ses → Anlam" },
+        { title: "Hedef bağımsız müzisyen", desc: "Temel baştan doğru kurulduğunda öğrenci yeni bir parçayı kendi başına okuyabilir, anlayabilir ve karakterini oluşturabilir. Öğretmene bağımlılık zamanla azalır.", meta: "Oku · Anla · Yorumla" },
       ],
     },
     screens: { eyebrow: "Ekranlar", heading: "Her egzersiz, gerçek nota yazımıyla." },
@@ -500,11 +506,15 @@ export const content: Record<Lang, Strings> = {
           items: ["Playable Examples", "Rhythm Games", "Generated Worksheets", "Scores You Can Hear"],
         },
       ],
+      principlesHeading: "The difference begins with the very first sound.",
+      principlesIntro: "Manus does not chase the appearance of quick progress. It builds a durable musical foundation in which sound, reading, technique and expression are inseparable, and every new skill moves the student towards independent musicianship.",
       features: [
-        { title: "Linear learning", desc: "Topics are placed in one pedagogical sequence. Students move page by page without getting lost in menus, and the app remembers their place.", meta: "Swipe · Continue" },
-        { title: "Music inside the page", desc: "Piano keys, rhythm strips and notation examples live directly on the page. Students listen, touch and play as they read.", meta: "Touch · Listen · Play" },
-        { title: "Writing and worksheets", desc: "Blank and notated PDFs generate fresh rhythms, ready for a teacher to use in lessons and a student to continue at home.", meta: "PDF · Print · Share" },
-        { title: "A real notation engine", desc: "Manus uses its own notation system to read and play polyphony, slurs, articulations, fingerings and dynamics.", meta: "MusicXML · Playback" },
+        { title: "Sound comes first", desc: "The first notes are made separately with a balanced finger and free arm weight. The goal is not to play many notes at once, but to establish a full, relaxed and carefully heard tone.", meta: "Weight · Balance · Tone" },
+        { title: "The keyboard is one whole", desc: "The hand is not confined to five neighbouring keys for months. Students travel across the keyboard from the beginning, without confusing notes with a fixed hand position or finger number.", meta: "Geography · Not position" },
+        { title: "Reading means real reading", desc: "Music writing is introduced from the first lessons through its horizontal and vertical axes. Students see the sign, imagine the sound and find its place on the keyboard independently.", meta: "See · Think · Find" },
+        { title: "Expression is not postponed", desc: "Detached, connected and short touches, dynamics and musical character all appear in the early repertoire. How a sound speaks matters as much as pressing the right key.", meta: "Articulation · Dynamics" },
+        { title: "Technique serves the music", desc: "Movement is learned as a way to produce a desired sound and character, not as isolated finger gymnastics. Technique grows together with listening and musical imagination.", meta: "Movement → Sound → Meaning" },
+        { title: "The goal is independence", desc: "With a sound foundation, students learn to read, understand and shape a new piece on their own. Their dependence on the teacher gradually decreases.", meta: "Read · Understand · Interpret" },
       ],
     },
     screens: { eyebrow: "Screens", heading: "Every exercise in real music notation." },

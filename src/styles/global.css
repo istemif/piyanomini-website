@@ -533,8 +533,33 @@ img {
   color: rgba(252, 251, 247, 0.4);
 }
 .manus-features {
-  margin-top: clamp(34px, 5vw, 72px);
   border-top-color: var(--bg);
+}
+.manus-principles-lead {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-block: clamp(48px, 7vw, 96px) clamp(24px, 3.5vw, 44px);
+}
+.manus-principles-lead h3 {
+  max-width: 15ch;
+  font-size: clamp(25px, 3.2vw, 43px);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+}
+.manus-principles-lead p {
+  max-width: 54ch;
+  color: rgba(252, 251, 247, 0.58);
+  font-size: clamp(15px, 1.4vw, 17px);
+  line-height: 1.55;
+}
+@media (min-width: 760px) {
+  .manus-principles-lead {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--gut);
+  }
 }
 .manus .feature-card {
   border-bottom-color: rgba(252, 251, 247, 0.2);
