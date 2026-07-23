@@ -1,5 +1,5 @@
 ---
-import { type Lang } from "../i18n/content";
+import { APP_STORE_URL, content, type Lang } from "../i18n/content";
 
 interface Props {
   lang: Lang;
@@ -7,14 +7,26 @@ interface Props {
   enHref: string;
 }
 const { lang, trHref, enHref } = Astro.props;
+const t = content[lang];
 ---
 
 <header class="masthead">
   <div class="wrap masthead-bar">
+    <a class="masthead-brand" href={lang === "tr" ? "/" : "/en/"} aria-label="Piyanomini">
+      Piyanomini
+    </a>
+    <nav class="site-nav mono" aria-label={lang === "tr" ? "Ana menü" : "Main navigation"}>
+      <a href="#ars">{t.nav.ars}</a>
+      <a href="#manus">{t.nav.manus}</a>
+      <a href="#principles">{t.nav.principles}</a>
+    </nav>
     <nav class="lang mono" aria-label={lang === "tr" ? "Dil" : "Language"}>
       <a href={trHref} aria-current={lang === "tr" ? "true" : "false"}>TR</a>
       <span class="sep">/</span>
       <a href={enHref} aria-current={lang === "en" ? "true" : "false"}>EN</a>
     </nav>
+    <a class="masthead-download mono" href={APP_STORE_URL} target="_blank" rel="noopener">
+      {t.nav.download}
+    </a>
   </div>
 </header>

@@ -38,12 +38,18 @@ const showGallery = false;
         <p class="hero-brand">Piyanomini.</p>
         <h1>{t.hero.title}</h1>
         <p class="intro">{t.hero.intro}</p>
+        <div class="product-line mono" aria-label={lang === "tr" ? "Uygulamalar" : "Apps"}>
+          {t.hero.modes.map((mode) => <span>{mode}</span>)}
+        </div>
         <div class="actions">
           <a class="cta" href={APP_STORE_URL} target="_blank" rel="noopener">
             <svg class="apple" viewBox="0 0 384 512" aria-hidden="true"
               ><path d={apple}></path></svg
             >
             {t.hero.cta}
+          </a>
+          <a class="secondary-cta mono" href="#manus">
+            {lang === "tr" ? "Manus'u keşfet" : "Explore Manus"}
           </a>
           <span class="mono muted">{t.hero.note}</span>
         </div>
@@ -64,7 +70,49 @@ const showGallery = false;
     </div>
   </section>
 
-  <!-- =========================== İÇİNDEKİLER ========================== -->
+  <!-- =========================== UYGULAMALAR ========================== -->
+  <section class="products">
+    <div class="wrap">
+      <div class="sec-label mono">
+        <span class="l">{t.products.eyebrow}</span>
+        <span>{t.products.count}</span>
+      </div>
+      <div class="section-lead">
+        <h2>{t.products.heading}</h2>
+        <p>{t.products.intro}</p>
+      </div>
+      <div class="product-grid">
+        {t.products.items.map((product, i) => (
+          <a class="product-card" href={product.href}>
+            <span class="pno mono">0{i + 1}</span>
+            <span class="product-name">{product.name}</span>
+            <span class="product-kind mono">{product.kind}</span>
+            <p>{product.desc}</p>
+            <span class="product-meta mono">{product.meta}</span>
+            <span class="product-link mono">
+              {lang === "tr" ? "İncele →" : "Explore →"}
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================== ARS ============================== -->
+  <section class="product-intro" id="ars">
+    <div class="wrap">
+      <div class="sec-label mono">
+        <span class="l">{t.ars.eyebrow}</span>
+        <span>{t.ars.note}</span>
+      </div>
+      <div class="section-lead">
+        <h2>{t.ars.heading}</h2>
+        <p>{t.ars.intro}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= ARS · İÇİNDEKİLER ======================= -->
   <section class="contents">
     <div class="wrap">
       <div class="sec-label mono">
@@ -97,7 +145,31 @@ const showGallery = false;
     </div>
   </section>
 
-  <!-- ============================= ARAÇLAR =========================== -->
+  <!-- ======================= ARS · ÇALIŞMA SİSTEMİ =================== -->
+  <section class="system">
+    <div class="wrap">
+      <div class="sec-label mono">
+        <span class="l">{t.system.eyebrow}</span>
+        <span>{t.system.count}</span>
+      </div>
+      <div class="section-lead">
+        <h2>{t.system.heading}</h2>
+        <p>{t.system.intro}</p>
+      </div>
+      <div class="feature-grid">
+        {t.system.items.map((item, i) => (
+          <article class="feature-card">
+            <span class="pno mono">{String(i + 1).padStart(2, "0")}</span>
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
+            <span class="feature-meta mono">{item.meta}</span>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= ARS · ARAÇLAR ========================= -->
   <section class="contents">
     <div class="wrap">
       <div class="sec-label mono">
@@ -149,8 +221,59 @@ const showGallery = false;
   </section>
   )}
 
+  <!-- ============================== MANUS ============================= -->
+  <section class="manus" id="manus">
+    <div class="wrap">
+      <div class="sec-label mono">
+        <span class="l">{t.manus.eyebrow}</span>
+        <span>{t.manus.count}</span>
+      </div>
+      <div class="section-lead manus-lead">
+        <h2>{t.manus.heading}</h2>
+        <div>
+          <p>{t.manus.intro}</p>
+          <span class="availability mono">{t.manus.availability}</span>
+        </div>
+      </div>
+
+      <div class="manus-chapters">
+        {t.manus.chapters.map((chapter, i) => (
+          <article class="manus-chapter">
+            <div class="manus-chapter-head">
+              <span class="idx mono">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <h3>{chapter.title}</h3>
+                <span class="mono muted">{chapter.tagline}</span>
+              </div>
+              <span class="mono muted">{chapter.count}</span>
+            </div>
+            <p>
+              {chapter.items.map((item, j) => (
+                <Fragment>
+                  {j > 0 && <span class="sep"> · </span>}
+                  <span>{item}</span>
+                </Fragment>
+              ))}
+            </p>
+          </article>
+        ))}
+      </div>
+
+      <div class="feature-grid manus-features">
+        {t.manus.features.map((item, i) => (
+          <article class="feature-card">
+            <span class="pno mono">{String(i + 1).padStart(2, "0")}</span>
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
+            <span class="feature-meta mono">{item.meta}</span>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
   <!-- ============================ İLKELER ============================= -->
-  <section class="principles">
+  <section class="principles" id="principles">
     <div class="wrap">
       <div class="sec-label mono">
         <span class="l">{t.principles.eyebrow}</span>
@@ -189,7 +312,9 @@ const showGallery = false;
         </div>
         <div>
           <span class="col-label mono">{t.footer.siteLabel}</span>
-          <a href={APP_STORE_URL} target="_blank" rel="noopener">App Store</a>
+          <a href="#ars">Piyanomini · Ars</a>
+          <a href="#manus">Piyanomini · Manus</a>
+          <a href={APP_STORE_URL} target="_blank" rel="noopener">Ars · App Store</a>
           <a href={lang === "tr" ? enHref : trHref}>{lang === "tr" ? "English" : "Türkçe"}</a>
         </div>
         <div>
