@@ -331,7 +331,6 @@ img {
   scroll-margin-top: 48px;
 }
 .product-intro {
-  border-top: 1px solid var(--rule);
   padding-bottom: clamp(18px, 2.5vw, 32px);
 }
 .section-lead {
@@ -377,9 +376,13 @@ img {
   padding-block: clamp(24px, 3vw, 40px);
   border-bottom: 1px solid var(--rule);
 }
+.product-card:last-child {
+  border-bottom: 0;
+}
 @media (min-width: 760px) {
   .product-card {
     padding-inline: clamp(22px, 3vw, 42px);
+    border-bottom: 0;
   }
   .product-card:first-child {
     padding-left: 0;
@@ -436,6 +439,9 @@ img {
   padding-block: clamp(20px, 2.8vw, 34px);
   border-bottom: 1px solid var(--line);
 }
+.feature-card:last-child {
+  border-bottom: 0;
+}
 @media (min-width: 720px) {
   .feature-card:nth-child(odd) {
     padding-right: var(--gut);
@@ -443,6 +449,9 @@ img {
   }
   .feature-card:nth-child(even) {
     padding-left: var(--gut);
+  }
+  .feature-card:nth-last-child(-n + 2) {
+    border-bottom: 0;
   }
 }
 .feature-card .pno,
@@ -499,6 +508,9 @@ img {
 .manus-chapter {
   padding-block: clamp(20px, 2.5vw, 32px);
   border-bottom: 1px solid rgba(252, 251, 247, 0.2);
+}
+.manus-chapter:last-child {
+  border-bottom: 0;
 }
 .manus-chapter-head {
   display: grid;
