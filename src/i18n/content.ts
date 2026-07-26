@@ -229,7 +229,7 @@ export const content: Record<Lang, Strings> = {
     manus: {
       eyebrow: "Piyanomini · Manus",
       count: "iPad · Türkçe / English",
-      heading: "Bir menü değil, ilerledikçe açılan bir kitap.",
+      heading: "Piyano eğitiminde yol arkadaşın.",
       intro: "Manus, piyano öğrenen öğrenciye ve öğretmenine bir yıl boyunca eşlik eden yatay bir kitap deneyimidir. Kaldığınız sayfayı hatırlar; her konu açıklama, dinleme, dokunma, çalma ve yazma arasında doğal bir sıra kurar.",
       availability: "Manus şu anda geliştiriliyor ve iPad için hazırlanıyor.",
       chapters: [
