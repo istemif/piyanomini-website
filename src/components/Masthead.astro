@@ -1,5 +1,5 @@
 ---
-import { APP_STORE_URL, content, type Lang } from "../i18n/content";
+import { APP_STORE_URL, APP_STORE_LIVE, content, type Lang } from "../i18n/content";
 
 interface Props {
   lang: Lang;
@@ -25,8 +25,14 @@ const t = content[lang];
       <span class="sep">/</span>
       <a href={enHref} aria-current={lang === "en" ? "true" : "false"}>EN</a>
     </nav>
-    <a class="masthead-download mono" href={APP_STORE_URL} target="_blank" rel="noopener">
-      {t.nav.download}
-    </a>
+    {APP_STORE_LIVE ? (
+      <a class="masthead-download mono" href={APP_STORE_URL} target="_blank" rel="noopener">
+        {t.nav.download}
+      </a>
+    ) : (
+      <span class="masthead-download is-pending mono">
+        {t.nav.downloadPending}
+      </span>
+    )}
   </div>
 </header>

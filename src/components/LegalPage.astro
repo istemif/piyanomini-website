@@ -5,13 +5,13 @@ import { content, CONTACT, type Lang } from "../i18n/content";
 
 interface Props {
   lang: Lang;
-  kind: "privacy" | "terms";
+  kind: "privacy" | "terms" | "support";
 }
 const { lang, kind } = Astro.props;
 
 const doc = content[lang].legal[kind];
-const trHref = kind === "privacy" ? "/privacy" : "/terms";
-const enHref = kind === "privacy" ? "/en/privacy" : "/en/terms";
+const trHref = `/${kind}`;
+const enHref = `/en/${kind}`;
 const canonicalPath = lang === "tr" ? trHref : enHref;
 const mail = `mailto:${CONTACT.email}`;
 ---

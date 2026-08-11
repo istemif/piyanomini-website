@@ -123,6 +123,19 @@ img {
   background: var(--bg);
   color: var(--fg);
 }
+/* Ars henüz App Store'da değil: buton görünür ama tıklanmaz (ters kontrast,
+   kesik çerçeve). APP_STORE_LIVE true olunca bu durum hiç render edilmez. */
+.cta-pending {
+  background: transparent;
+  color: var(--muted);
+  border-style: dashed;
+  border-color: var(--rule);
+  cursor: default;
+}
+.cta-pending:hover {
+  background: transparent;
+  color: var(--muted);
+}
 .cta .apple {
   width: 13px;
   height: 13px;
@@ -184,6 +197,13 @@ img {
   padding: 8px 10px;
   background: var(--fg);
   color: var(--bg);
+}
+.masthead-download.is-pending {
+  background: transparent;
+  color: var(--muted);
+  border: 1px dashed var(--rule);
+  padding: 7px 9px;
+  cursor: default;
 }
 .hero-brand {
   margin-bottom: 10px;
@@ -512,22 +532,62 @@ img {
 .manus-chapter:last-child {
   border-bottom: 0;
 }
+/* .cat-head ile aynı ızgara: aynı 2.2rem numara kolonu, aynı 720px kırılması.
+   Tek fark koyu zemin, o yüzden gri tonlar rgba ile veriliyor. */
 .manus-chapter-head {
   display: grid;
-  grid-template-columns: 2rem 1fr auto;
-  gap: var(--gut);
+  grid-template-columns: 2.2rem 1fr;
+  gap: 4px var(--gut);
   align-items: baseline;
 }
+@media (min-width: 720px) {
+  .manus-chapter-head {
+    grid-template-columns: 2.2rem 1fr auto;
+  }
+}
+.manus-chapter-head .idx {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: rgba(252, 251, 247, 0.58);
+}
+.manus-chapter-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.manus-chapter-head .meta {
+  color: rgba(252, 251, 247, 0.58);
+  white-space: nowrap;
+  text-align: right;
+}
+@media (max-width: 719px) {
+  .manus-chapter-head .meta {
+    grid-column: 2;
+    text-align: left;
+    margin-top: 2px;
+  }
+}
 .manus-chapter h3 {
-  font-size: clamp(22px, 2.4vw, 31px);
+  font-size: clamp(22px, 2.3vw, 30px);
   font-weight: 500;
   letter-spacing: -0.025em;
+  line-height: 1.04;
 }
 .manus-chapter p {
-  margin-top: 12px;
-  padding-left: calc(2rem + var(--gut));
+  margin-top: clamp(10px, 1.3vw, 14px);
   max-width: 70ch;
+  font-size: clamp(15px, 1.4vw, 17px);
   line-height: 1.7;
+}
+@media (min-width: 720px) {
+  .manus-chapter p {
+    padding-left: calc(2.2rem + var(--gut));
+  }
+}
+.manus-chapter .ex {
+  white-space: nowrap;
 }
 .manus-chapter .sep {
   color: rgba(252, 251, 247, 0.4);
@@ -937,15 +997,6 @@ img {
   .toc-row {
     grid-template-columns: 1.8rem 1fr;
     gap: 12px;
-  }
-  .manus-chapter-head {
-    grid-template-columns: 1.8rem 1fr;
-  }
-  .manus-chapter-head > :last-child {
-    grid-column: 2;
-  }
-  .manus-chapter p {
-    padding-left: calc(1.8rem + 12px);
   }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -1,5 +1,5 @@
 ---
-import { content, APP_STORE_URL, CONTACT, type Lang } from "../i18n/content";
+import { content, APP_STORE_URL, APP_STORE_LIVE, CONTACT, type Lang } from "../i18n/content";
 import Masthead from "./Masthead.astro";
 
 interface Props {
@@ -42,12 +42,21 @@ const showGallery = false;
           {t.hero.modes.map((mode) => <span>{mode}</span>)}
         </div>
         <div class="actions">
-          <a class="cta" href={APP_STORE_URL} target="_blank" rel="noopener">
-            <svg class="apple" viewBox="0 0 384 512" aria-hidden="true"
-              ><path d={apple}></path></svg
-            >
-            {t.hero.cta}
-          </a>
+          {APP_STORE_LIVE ? (
+            <a class="cta" href={APP_STORE_URL} target="_blank" rel="noopener">
+              <svg class="apple" viewBox="0 0 384 512" aria-hidden="true"
+                ><path d={apple}></path></svg
+              >
+              {t.hero.cta}
+            </a>
+          ) : (
+            <span class="cta cta-pending">
+              <svg class="apple" viewBox="0 0 384 512" aria-hidden="true"
+                ><path d={apple}></path></svg
+              >
+              {t.hero.ctaPending}
+            </span>
+          )}
           <a class="secondary-cta mono" href="#manus">
             {lang === "tr" ? "Manus'u keşfet" : "Explore Manus"}
           </a>
@@ -226,9 +235,9 @@ const showGallery = false;
     <div class="wrap">
       <div class="sec-label mono">
         <span class="l">{t.manus.eyebrow}</span>
-        <span>{t.manus.count}</span>
+        <span>{t.manus.note}</span>
       </div>
-      <div class="section-lead manus-lead">
+      <div class="section-lead">
         <h2>{t.manus.heading}</h2>
         <div>
           <p>{t.manus.intro}</p>
@@ -240,18 +249,18 @@ const showGallery = false;
         {t.manus.chapters.map((chapter, i) => (
           <article class="manus-chapter">
             <div class="manus-chapter-head">
-              <span class="idx mono">{String(i + 1).padStart(2, "0")}</span>
-              <div>
+              <span class="idx">{String(i + 1).padStart(2, "0")}</span>
+              <div class="manus-chapter-title">
                 <h3>{chapter.title}</h3>
                 <span class="mono muted">{chapter.tagline}</span>
               </div>
-              <span class="mono muted">{chapter.count}</span>
+              <span class="meta mono">{chapter.count}</span>
             </div>
             <p>
               {chapter.items.map((item, j) => (
                 <Fragment>
                   {j > 0 && <span class="sep"> · </span>}
-                  <span>{item}</span>
+                  <span class="ex">{item}</span>
                 </Fragment>
               ))}
             </p>
@@ -312,13 +321,18 @@ const showGallery = false;
         <div>
           <span class="col-label mono">{t.footer.contactLabel}</span>
           <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+          <a href={lang === "en" ? "/en/support" : "/support"}>{t.footer.support}</a>
           <a href={CONTACT.instagram} target="_blank" rel="noopener">{CONTACT.instagramHandle}</a>
         </div>
         <div>
           <span class="col-label mono">{t.footer.siteLabel}</span>
           <a href="#ars">Piyanomini · Ars</a>
           <a href="#manus">Piyanomini · Manus</a>
-          <a href={APP_STORE_URL} target="_blank" rel="noopener">Ars · App Store</a>
+          {APP_STORE_LIVE ? (
+            <a href={APP_STORE_URL} target="_blank" rel="noopener">Ars · App Store</a>
+          ) : (
+            <span class="row muted">{t.hero.ctaPending}</span>
+          )}
           <a href={lang === "tr" ? enHref : trHref}>{lang === "tr" ? "English" : "Türkçe"}</a>
         </div>
         <div>

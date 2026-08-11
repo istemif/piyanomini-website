@@ -6,6 +6,10 @@
 // Tek CTA: App Store linki. Uygulama yayınlanınca burayı güncelle.
 export const APP_STORE_URL = "https://apps.apple.com/app/piyanomini/id000000000";
 
+// Ars App Store'da yayımlanınca: yukarıdaki URL'i gerçek linkle değiştir + bunu true yap.
+// false iken tüm App Store butonları tıklanmaz "yakında" durumunda kalır.
+export const APP_STORE_LIVE = false;
+
 export const CONTACT = {
   email: "hello@istemifurkan.com",
   instagram: "https://www.instagram.com/piyanomini/",
@@ -37,8 +41,15 @@ type Strings = {
   htmlLang: string;
   meta: { title: string; description: string };
   edition: string;
-  nav: { ars: string; manus: string; principles: string; download: string };
-  hero: { title: string; intro: string; cta: string; note: string; modes: string[] };
+  nav: { ars: string; manus: string; principles: string; download: string; downloadPending: string };
+  hero: {
+    title: string;
+    intro: string;
+    cta: string;
+    ctaPending: string;
+    note: string;
+    modes: string[];
+  };
   spec: KV[];
   products: {
     eyebrow: string;
@@ -59,7 +70,7 @@ type Strings = {
   tools: { eyebrow: string; count: string; items: Module[] };
   manus: {
     eyebrow: string;
-    count: string;
+    note: string;
     heading: string;
     intro: string;
     availability: string;
@@ -85,8 +96,9 @@ type Strings = {
     rights: string;
     privacy: string;
     terms: string;
+    support: string;
   };
-  legal: { backHome: string; privacy: LegalDoc; terms: LegalDoc };
+  legal: { backHome: string; privacy: LegalDoc; terms: LegalDoc; support: LegalDoc };
 };
 
 export const content: Record<Lang, Strings> = {
@@ -103,12 +115,14 @@ export const content: Record<Lang, Strings> = {
       manus: "Manus",
       principles: "İlkeler",
       download: "App Store",
+      downloadPending: "Yakında",
     },
     hero: {
       title: "Müziği öğrenmek ve çalışmak için iki yol.",
       intro:
         "Ars, ritimden armoni ve kontrpuana uzanan bir müzik çalışma alanıdır. Manus, bir yıl boyunca piyano eğitimine eşlik eden doğrusal ve etkileşimli bir kitaptır. İkisi de müziği dinleyerek, anlayarak ve yaparak öğrenmek için tasarlandı.",
       cta: "Ars'ı App Store'dan indir",
+      ctaPending: "Ars · App Store'da yakında",
       note: "Manus · iPad için geliştiriliyor",
       modes: ["Piyanomini · Ars", "Piyanomini · Manus"],
     },
@@ -117,6 +131,7 @@ export const content: Record<Lang, Strings> = {
       { label: "Ars", value: "8 konu · 32 alıştırma" },
       { label: "Manus", value: "1 yıllık piyano yolculuğu" },
       { label: "Cihazlar", value: "iPhone · iPad" },
+      { label: "Ars dilleri", value: "Türkçe · English · Русский" },
       { label: "Yaklaşım", value: "Dinle · Anla · Uygula" },
     ],
     products: {
@@ -143,7 +158,7 @@ export const content: Record<Lang, Strings> = {
     },
     ars: {
       eyebrow: "Piyanomini · Ars",
-      note: "iPhone · iPad",
+      note: "iPhone · iPad · TR · EN · RU",
       heading: "Duy. Oku. Kur. Söyle. Yaz.",
       intro: "Ars müziği sekiz konu etrafında birleştirir: ritimden nota ve aralığa, melodiden armoni ve kontrpuana. Konuyu etkileşimli anlatımla öğrenin; gerçek nota yazımıyla, kulağınızla ve sesinizle çalışın.",
     },
@@ -228,7 +243,7 @@ export const content: Record<Lang, Strings> = {
     },
     manus: {
       eyebrow: "Piyanomini · Manus",
-      count: "iPad · Türkçe / English",
+      note: "iPad · TR · EN",
       heading: "Piyano eğitiminde yol arkadaşın.",
       intro: "Manus, piyano öğrenen öğrenciye ve öğretmenine bir yıl boyunca eşlik eden yatay bir kitap deneyimidir. Kaldığınız sayfayı hatırlar; her konu açıklama, dinleme, dokunma, çalma ve yazma arasında doğal bir sıra kurar.",
       availability: "Manus şu anda geliştiriliyor ve iPad için hazırlanıyor.",
@@ -272,18 +287,18 @@ export const content: Record<Lang, Strings> = {
     screens: { eyebrow: "Ekranlar", heading: "Her egzersiz, gerçek nota yazımıyla." },
     principles: {
       eyebrow: "İlkeler",
-      note: "Ars · Dürüst yazılım",
+      note: "Ars · Manus · Dürüst yazılım",
       heading: "Önce deneyin, sonra karar verin.",
       intro:
-        "Piyanomini'yi satın almadan önce tam haliyle kullanabilin istedik. Deneme süresinde özellik kısıtlaması yoktur; süre bittiğinde siz satın almadıkça ücret alınmaz.",
+        "Her iki uygulamayı da satın almadan önce tam haliyle kullanabilin istedik. Deneme süresinde özellik kısıtlaması yoktur; süre bittiğinde siz satın almadıkça ücret alınmaz.",
       items: [
-        { title: "Tam deneme, kart tuzağı yok", desc: "14 gün boyunca tüm özellikler açıktır. Süre sonunda siz açıkça satın almadıkça hiçbir ücret alınmaz." },
-        { title: "Abonelik yok", desc: "Tek seferlik satın alma vardır. Aylık ya da yıllık yenileme yoktur." },
+        { title: "Tam deneme, kart tuzağı yok", desc: "Ars'ta da Manus'ta da 14 gün boyunca tüm özellikler açıktır. Süre sonunda siz açıkça satın almadıkça hiçbir ücret alınmaz." },
+        { title: "Abonelik yok", desc: "Her uygulama tek seferlik satın almadır. Aylık ya da yıllık yenileme yoktur." },
         { title: "Aile Paylaşımı dahil", desc: "Tek satın alma, Apple Aile Paylaşımı grubundaki 6 kişiye kadar herkes için geçerli. Bir kez alın, aileniz birlikte kullansın." },
-        { title: "Hesap yok, internet gerekmez", desc: "Kayıt, e-posta ya da şifre istemez. Egzersizler, ayarlar ve kayıtlar cihazınızda kalır." },
+        { title: "Hesap yok, internet gerekmez", desc: "Kayıt, e-posta ya da şifre istemez. Alıştırmalar, ayarlar ve kayıtlar cihazınızda kalır." },
         { title: "Reklam, takip, veri yok", desc: "Analitik, reklam ya da izleme aracı kullanmıyoruz; kişisel verinizi toplamıyoruz." },
         { title: "Öğretmenin yerini almaz", desc: "Öğretmeninizle yürüttüğünüz çalışmayı desteklemek için tasarlandı; onun yerine geçmek için değil." },
-        { title: "Doldurma yok", desc: "Her modül gerçek bir çalışma ihtiyacından doğdu. Listeyi kalabalık göstermek için konmuş bölüm yoktur." },
+        { title: "Doldurma yok", desc: "Her konu ve her bölüm gerçek bir çalışma ihtiyacından doğdu. Listeyi kalabalık göstermek için konmuş bölüm yoktur." },
       ],
     },
     footer: {
@@ -295,6 +310,7 @@ export const content: Record<Lang, Strings> = {
       rights: "Tüm hakları saklıdır.",
       privacy: "Gizlilik",
       terms: "Kullanım Şartları",
+      support: "Destek",
     },
     legal: {
       backHome: "← Ana sayfa",
@@ -302,13 +318,13 @@ export const content: Record<Lang, Strings> = {
         eyebrow: "Gizlilik",
         title: "Gizlilik Politikası",
         titleTag: "Gizlilik Politikası · Piyanomini",
-        updated: "Son güncelleme: 28 Mayıs 2026",
-        lead: "Piyanomini gizliliğe saygı duyar. Kısacası: kişisel veri toplamıyoruz; uygulama verileriniz cihazınızda kalır.",
+        updated: "Son güncelleme: 26 Temmuz 2026",
+        lead: "Piyanomini gizliliğe saygı duyar. Bu politika Piyanomini Ars ve Piyanomini Manus uygulamalarının ikisi için de geçerlidir. Kısacası: kişisel veri toplamıyoruz; uygulama verileriniz cihazınızda kalır.",
         sections: [
-          { h: "Veri toplamıyoruz", p: "Piyanomini hesap, kayıt ya da giriş gerektirmez. Adınızı, e-postanızı veya başka bir kişisel bilginizi istemez ve saklamayız." },
+          { h: "Veri toplamıyoruz", p: "Piyanomini uygulamaları hesap, kayıt ya da giriş gerektirmez. Adınızı, e-postanızı veya başka bir kişisel bilginizi istemez ve saklamayız." },
           { h: "Verileriniz cihazınızda kalır", p: "İlerlemeniz, ayarlarınız, hatırlatmalarınız ve çalışma kayıtlarınız yalnızca cihazınızda saklanır. Bizim sunucularımıza gönderilmez; zaten bir sunucumuz yok. Uygulamayı silerseniz bu yerel veriler de silinebilir. Satın alma durumunuz Apple hesabınız üzerinden geri yüklenebilir. Temel egzersizler internet bağlantısı olmadan çalışır; satın alma, satın almayı geri yükleme ve dış bağlantılar ilgili Apple ya da üçüncü taraf servis bağlantısını gerektirebilir." },
           { h: "Analitik, izleme ve reklam yok", p: "Üçüncü taraf analiz, izleme veya reklam araçları kullanmıyoruz. Davranışınızı takip etmiyoruz." },
-          { h: "Mikrofon", p: "Tuner, vokal ve akort ölçümü gibi mikrofon gerektiren özellikler için mikrofon erişimi istenir. Ses yalnızca perde analizi amacıyla cihazınızda anlık olarak işlenir; kaydedilmez, saklanmaz ve hiçbir yere gönderilmez. Mikrofon iznini dilediğiniz an cihaz ayarlarından geri alabilirsiniz." },
+          { h: "Mikrofon", p: "Ars'taki tuner ve söyleme alıştırmaları gibi mikrofon gerektiren özellikler için mikrofon erişimi istenir. Ses yalnızca perde analizi amacıyla cihazınızda anlık olarak işlenir; kaydedilmez, saklanmaz ve hiçbir yere gönderilmez. Mikrofon iznini dilediğiniz an cihaz ayarlarından geri alabilirsiniz." },
           { h: "Bildirimler", p: "Çalışma hatırlatıcıları, seçtiğiniz gün ve saatlere göre iOS tarafından cihazınızda zamanlanır. Hatırlatma bilgileriniz bize gönderilmez." },
           { h: "Satın almalar", p: "Satın almalar Apple App Store üzerinden gerçekleşir ve Apple tarafından işlenir. Ödeme bilgilerinize erişimimiz yoktur. Uygulama, yalnızca satın alma durumunu doğrulamak ve erişimi açmak için Apple'ın sağladığı işlem durumunu kullanır." },
           { h: "İletişim ve dış bağlantılar", p: "Uygulama içinden e-posta, WhatsApp, Instagram veya web sitesi gibi dış bağlantılar açabilirsiniz. Bu servisleri kullanırsanız, paylaşmayı seçtiğiniz bilgiler ilgili servisin gizlilik politikasına tabidir." },
@@ -322,19 +338,36 @@ export const content: Record<Lang, Strings> = {
         eyebrow: "Yasal",
         title: "Kullanım Şartları",
         titleTag: "Kullanım Şartları · Piyanomini",
-        updated: "Son güncelleme: 10 Haziran 2026",
-        lead: "Piyanomini'yi kullanarak aşağıdaki şartları kabul etmiş olursunuz.",
+        updated: "Son güncelleme: 26 Temmuz 2026",
+        lead: "Piyanomini Ars ya da Piyanomini Manus'u kullanarak aşağıdaki şartları kabul etmiş olursunuz. Şartlar iki uygulama için de geçerlidir; her uygulama ayrı satın alınır.",
         sections: [
-          { h: "Lisans", p: "Piyanomini'yi kendi cihazlarınızda, bireysel çalışma ve ders bağlamında kullanabilirsiniz. Satın alma, App Store hesabınız üzerinden size kişisel ve devredilemez bir kullanım hakkı verir; bu hak, Apple Aile Paylaşımı yoluyla aile grubunuzdaki üyelerle paylaşılabilir. Uygulamayı kopyalayamaz, dağıtamaz, yeniden satamaz veya tersine mühendislik yapamazsınız." },
-          { h: "Ücretsiz deneme", p: "Uygulama ilk kullanımdan itibaren 14 gün boyunca tam sürümüyle ücretsiz denenebilir. Deneme süresinde uygulama içinden ödeme başlatılmaz, kart istenmez ve süre sonunda otomatik ücret alınmaz. Süre bittiğinde satın almazsanız erişim kısıtlanır; uygulamayı silip yeniden yüklemek denemeyi sıfırlamayabilir. Abonelik yoktur." },
-          { h: "Satın alma ve geri yükleme", p: "Tek seferlik satın alma, uygulamanın tüm özelliklerine kalıcı erişim sağlar; aynı Apple hesabıyla desteklenen cihazlarda ya da Apple Aile Paylaşımı grubunuzdaki üyeler tarafından geri yüklenebilir. Yeni özellikler ve güncellemeler dahil edilebilir; ancak uygulamanın kapsamı, teknik gereklilikler veya platform koşulları zaman içinde değişebilir." },
+          { h: "Lisans", p: "Uygulamaları kendi cihazlarınızda, bireysel çalışma ve ders bağlamında kullanabilirsiniz. Satın alma, App Store hesabınız üzerinden size kişisel ve devredilemez bir kullanım hakkı verir; bu hak, Apple Aile Paylaşımı yoluyla aile grubunuzdaki üyelerle paylaşılabilir. Uygulamayı kopyalayamaz, dağıtamaz, yeniden satamaz veya tersine mühendislik yapamazsınız." },
+          { h: "Ücretsiz deneme", p: "Her uygulama, ilk kullanımdan itibaren 14 gün boyunca tam sürümüyle ücretsiz denenebilir. Deneme süresinde uygulama içinden ödeme başlatılmaz, kart istenmez ve süre sonunda otomatik ücret alınmaz. Süre bittiğinde satın almazsanız erişim kısıtlanır; uygulamayı silip yeniden yüklemek denemeyi sıfırlamayabilir. Abonelik yoktur." },
+          { h: "Satın alma ve geri yükleme", p: "Tek seferlik satın alma, ilgili uygulamanın tüm özelliklerine kalıcı erişim sağlar; aynı Apple hesabıyla desteklenen cihazlarda ya da Apple Aile Paylaşımı grubunuzdaki üyeler tarafından geri yüklenebilir. Yeni özellikler ve güncellemeler dahil edilebilir; ancak uygulamanın kapsamı, teknik gereklilikler veya platform koşulları zaman içinde değişebilir." },
           { h: "İade", p: "Satın almalar Apple App Store üzerinden gerçekleşir. İade talepleri Apple'ın iade politikasına tabidir ve doğrudan Apple'a iletilir; ödeme bilgilerinize erişimimiz yoktur." },
-          { h: "Fikri mülkiyet", p: "Uygulama, tasarımı, egzersizleri, yazılımı, görsel ve işitsel içerikleri ile Piyanomini markası Piyanomini'ye aittir ve telif hakkıyla korunur." },
+          { h: "Fikri mülkiyet", p: "Uygulamalar, tasarımları, alıştırmaları, yazılımı, görsel ve işitsel içerikleri ile Piyanomini, Ars ve Manus adları Piyanomini'ye aittir ve telif hakkıyla korunur." },
           { h: "Sorumluluğun sınırlandırılması", p: "Piyanomini eğitim ve pratik amacıyla sunulur; öğretmen, uzman değerlendirmesi veya profesyonel hizmet yerine geçmez. Uygulama 'olduğu gibi' sağlanır. Yasaların izin verdiği ölçüde, kullanımından doğabilecek dolaylı zararlardan sorumlu değiliz." },
           { h: "Değişiklikler", p: "Bu şartları zaman zaman güncelleyebiliriz. Güncel sürüm her zaman bu sayfada yer alır; uygulamayı kullanmaya devam etmeniz güncel şartları kabul ettiğiniz anlamına gelir." },
         ],
         contactHeading: "İletişim",
         contactText: "Sorularınız için:",
+      },
+      support: {
+        eyebrow: "Destek",
+        title: "Destek",
+        titleTag: "Destek · Piyanomini",
+        updated: "Son güncelleme: 11 Ağustos 2026",
+        lead: "Piyanomini Ars ve Piyanomini Manus için destek e-posta ile veriliyor. Sorunuzu yazın, genellikle 1-2 iş günü içinde yanıtlıyoruz.",
+        sections: [
+          { h: "Yazarken nelere yer verin", p: "Hangi uygulamayı kullandığınızı (Ars ya da Manus), uygulama sürümünü, cihaz modelinizi ve iOS sürümünü belirtin. Uygulama sürümü, Ayarlar ekranının altında v ile başlayan satırda görünür. Sorun belirli bir alıştırmada çıkıyorsa alıştırmanın adını ve kullandığınız ayarları da ekleyin; aynı durumu birebir yeniden üretebilirsek çözüm çok daha hızlı oluyor." },
+          { h: "Ücretsiz deneme", p: "Her uygulama, ilk kullanımdan itibaren 14 gün boyunca tam sürümüyle ücretsiz denenir. Deneme sırasında kart bilgisi istenmez, süre sonunda otomatik ücret alınmaz ve abonelik yoktur. Süre dolduğunda satın alarak kaldığınız yerden devam edersiniz; çalışma geçmişiniz cihazınızda durur." },
+          { h: "Satın almayı geri yükleme", p: "Cihaz değiştirdiyseniz ya da uygulamayı yeniden yüklediyseniz satın alma ekranındaki Geri Yükle bağlantısına dokunun. Satın alma, aynı Apple hesabıyla kullandığınız cihazlarda ve Apple Aile Paylaşımı grubunuzdaki üyelerde geçerlidir. Geri yükleme sonuç vermezse cihazın App Store'da doğru Apple hesabıyla açık olduğunu kontrol edin, sonra bize yazın." },
+          { h: "Mikrofon ve ses", p: "Akort cihazı, entonasyon ve söyleme alıştırmaları mikrofon erişimi ister; izni reddettiyseniz cihaz ayarlarından açabilirsiniz. Perde algılamada sapma görüyorsanız sessiz bir odada deneyin. Hoparlörden çıkan sesin mikrofona geri dönmemesi için kulaklık kullanmak sonucu belirgin biçimde düzeltir." },
+          { h: "İade", p: "Satın almalar App Store üzerinden Apple tarafından işlenir, iade talepleri de Apple'a iletilir. Ödeme bilgilerinize erişimimiz olmadığı için iadeyi bizim tarafımızdan başlatamıyoruz; Apple'ın iade sayfasından talep açabilirsiniz." },
+          { h: "Öğretmenler, okullar ve öneriler", p: "Sınıf kullanımı, öğrenci grupları ve kurumsal sorular için yazabilirsiniz. Hata bildirimleri, eksik bulduğunuz konular ve yeni alıştırma önerileri de aynı adrese geliyor; yol haritası büyük ölçüde bu geri bildirimlerle şekilleniyor." },
+        ],
+        contactHeading: "İletişim",
+        contactText: "Destek ve tüm sorularınız için:",
       },
     },
   },
@@ -351,12 +384,14 @@ export const content: Record<Lang, Strings> = {
       manus: "Manus",
       principles: "Principles",
       download: "App Store",
+      downloadPending: "Soon",
     },
     hero: {
       title: "Two ways to learn and practise music.",
       intro:
         "Ars is a music practice space spanning rhythm, harmony and counterpoint. Manus is a linear, interactive book that accompanies a full year of piano learning. Both are built around learning by listening, understanding and doing.",
       cta: "Download Ars on the App Store",
+      ctaPending: "Ars · coming soon to the App Store",
       note: "Manus · in development for iPad",
       modes: ["Piyanomini · Ars", "Piyanomini · Manus"],
     },
@@ -365,6 +400,7 @@ export const content: Record<Lang, Strings> = {
       { label: "Ars", value: "8 topics · 32 exercises" },
       { label: "Manus", value: "A full year of piano" },
       { label: "Devices", value: "iPhone · iPad" },
+      { label: "Ars languages", value: "Türkçe · English · Русский" },
       { label: "Approach", value: "Listen · Understand · Do" },
     ],
     products: {
@@ -391,7 +427,7 @@ export const content: Record<Lang, Strings> = {
     },
     ars: {
       eyebrow: "Piyanomini · Ars",
-      note: "iPhone · iPad",
+      note: "iPhone · iPad · TR · EN · RU",
       heading: "Hear. Read. Build. Sing. Write.",
       intro: "Ars brings music together around eight topics: from rhythm, notes and intervals to melody, harmony and counterpoint. Learn through interactive lessons, then practise with real notation, your ear and your voice.",
     },
@@ -476,8 +512,8 @@ export const content: Record<Lang, Strings> = {
     },
     manus: {
       eyebrow: "Piyanomini · Manus",
-      count: "iPad · Türkçe / English",
-      heading: "Not a menu, but a book that unfolds as you progress.",
+      note: "iPad · TR · EN",
+      heading: "Your companion in learning the piano.",
       intro: "Manus is a horizontal book experience that accompanies a piano student and teacher for a full year. It remembers your page and gives each subject a natural sequence through explanation, listening, touch, playing and writing.",
       availability: "Manus is currently in development for iPad.",
       chapters: [
@@ -520,18 +556,18 @@ export const content: Record<Lang, Strings> = {
     screens: { eyebrow: "Screens", heading: "Every exercise in real music notation." },
     principles: {
       eyebrow: "Principles",
-      note: "Ars · Honest software",
+      note: "Ars · Manus · Honest software",
       heading: "Try first, then decide.",
       intro:
-        "We wanted you to use Piyanomini in full before paying. The trial is not a cut-down demo; when it ends, nothing is charged unless you choose to buy.",
+        "We wanted you to use either app in full before paying. The trial is not a cut-down demo; when it ends, nothing is charged unless you choose to buy.",
       items: [
-        { title: "Full trial, no surprise charge", desc: "All features are available for 14 days. When the trial ends, nothing is charged unless you explicitly buy." },
-        { title: "No subscription", desc: "Piyanomini is a one-time purchase. No monthly or yearly renewals." },
+        { title: "Full trial, no surprise charge", desc: "All features are available for 14 days, in Ars and in Manus alike. When the trial ends, nothing is charged unless you explicitly buy." },
+        { title: "No subscription", desc: "Each app is a one-time purchase. No monthly or yearly renewals." },
         { title: "Family Sharing included", desc: "One purchase covers up to 6 people in your Apple Family Sharing group. Buy once, use it together as a family." },
         { title: "No account, no internet", desc: "No sign-up, email or password. Exercises, settings and logs stay on your device." },
         { title: "No ads, tracking or data", desc: "We use no analytics, advertising or tracking tools, and we collect no personal data." },
         { title: "Doesn't replace your teacher", desc: "Designed to support the work you do with your music teacher, not to replace them." },
-        { title: "No filler", desc: "Every module comes from a real practice need. Nothing is there just to make the list look longer." },
+        { title: "No filler", desc: "Every topic and every chapter comes from a real practice need. Nothing is there just to make the list look longer." },
       ],
     },
     footer: {
@@ -543,6 +579,7 @@ export const content: Record<Lang, Strings> = {
       rights: "All rights reserved.",
       privacy: "Privacy",
       terms: "Terms",
+      support: "Support",
     },
     legal: {
       backHome: "← Home",
@@ -550,13 +587,13 @@ export const content: Record<Lang, Strings> = {
         eyebrow: "Privacy",
         title: "Privacy Policy",
         titleTag: "Privacy Policy · Piyanomini",
-        updated: "Last updated: May 28, 2026",
-        lead: "Piyanomini respects your privacy. In short: we collect no personal data; your app data stays on your device.",
+        updated: "Last updated: July 26, 2026",
+        lead: "Piyanomini respects your privacy. This policy applies to both Piyanomini Ars and Piyanomini Manus. In short: we collect no personal data; your app data stays on your device.",
         sections: [
-          { h: "We collect no data", p: "Piyanomini requires no account, sign-up or login. We never ask for or store your name, email or any other personal information." },
+          { h: "We collect no data", p: "The Piyanomini apps require no account, sign-up or login. We never ask for or store your name, email or any other personal information." },
           { h: "Your data stays on your device", p: "Your progress, settings, reminders and practice logs are stored only on your device. They are never sent to our servers; we don't have any. If you delete the app, this local data may be deleted as well. Your purchase status can be restored through your Apple account. Core exercises work without an internet connection; purchases, purchase restoration and external links may require a connection to Apple or the relevant third-party service." },
           { h: "No analytics, tracking or ads", p: "We use no third-party analytics, tracking or advertising tools. We don't track your behaviour." },
-          { h: "Microphone", p: "Features that require microphone input, such as the tuner, vocal practice and tuning measurement, request microphone access. Audio is processed on your device in real time for pitch analysis only; it is never recorded, stored or sent anywhere. You can revoke microphone access at any time in your device settings." },
+          { h: "Microphone", p: "Features that require microphone input, such as the tuner and the singing exercises in Ars, request microphone access. Audio is processed on your device in real time for pitch analysis only; it is never recorded, stored or sent anywhere. You can revoke microphone access at any time in your device settings." },
           { h: "Notifications", p: "Practice reminders are scheduled locally by iOS on the days and times you choose. Your reminder information is not sent to us." },
           { h: "Purchases", p: "Purchases are made through the Apple App Store and handled by Apple. We have no access to your payment details. The app only uses the transaction status provided by Apple to verify purchases and unlock access." },
           { h: "Contact and external links", p: "The app may open external links such as email, WhatsApp, Instagram or the website. If you use those services, any information you choose to share is handled under that service's privacy policy." },
@@ -570,19 +607,36 @@ export const content: Record<Lang, Strings> = {
         eyebrow: "Legal",
         title: "Terms of Use",
         titleTag: "Terms of Use · Piyanomini",
-        updated: "Last updated: June 10, 2026",
-        lead: "By using Piyanomini, you agree to the following terms.",
+        updated: "Last updated: July 26, 2026",
+        lead: "By using Piyanomini Ars or Piyanomini Manus, you agree to the following terms. They apply to both apps; each app is purchased separately.",
         sections: [
-          { h: "License", p: "You may use Piyanomini on your own devices for individual practice and in teaching contexts. A purchase gives you a personal, non-transferable right to use the app through your App Store account; this right may be shared with members of your family group via Apple Family Sharing. You may not copy, distribute, resell or reverse-engineer the app." },
-          { h: "Free trial", p: "The app can be tried in full for 14 days from first use. During the trial, no in-app payment is started, no card is requested and no automatic charge is made when the trial ends. After it ends, access is restricted unless you buy. Deleting and reinstalling the app may not reset the trial. There is no subscription." },
-          { h: "Purchase and restoration", p: "A one-time purchase gives permanent access to all app features and can be restored on supported devices using the same Apple account, or by members of your Apple Family Sharing group. New features and updates may be included, but the app's scope, technical requirements or platform conditions may change over time." },
+          { h: "License", p: "You may use the apps on your own devices for individual practice and in teaching contexts. A purchase gives you a personal, non-transferable right to use the app through your App Store account; this right may be shared with members of your family group via Apple Family Sharing. You may not copy, distribute, resell or reverse-engineer the app." },
+          { h: "Free trial", p: "Each app can be tried in full for 14 days from first use. During the trial, no in-app payment is started, no card is requested and no automatic charge is made when the trial ends. After it ends, access is restricted unless you buy. Deleting and reinstalling the app may not reset the trial. There is no subscription." },
+          { h: "Purchase and restoration", p: "A one-time purchase gives permanent access to all features of that app and can be restored on supported devices using the same Apple account, or by members of your Apple Family Sharing group. New features and updates may be included, but the app's scope, technical requirements or platform conditions may change over time." },
           { h: "Refunds", p: "Purchases are made through the Apple App Store. Refund requests are subject to Apple's refund policy and handled directly by Apple; we have no access to your payment details." },
-          { h: "Intellectual property", p: "The app, its design, exercises, software, visual and audio content, and the Piyanomini brand belong to Piyanomini and are protected by copyright." },
+          { h: "Intellectual property", p: "The apps, their design, exercises, software, visual and audio content, and the Piyanomini, Ars and Manus names belong to Piyanomini and are protected by copyright." },
           { h: "Limitation of liability", p: "Piyanomini is provided for education and practice; it does not replace a teacher, expert assessment or professional service. The app is provided 'as is'. To the extent permitted by law, we are not liable for any indirect damages arising from its use." },
           { h: "Changes", p: "We may update these terms from time to time. The current version is always available on this page; continuing to use the app means you accept the current terms." },
         ],
         contactHeading: "Contact",
         contactText: "For questions:",
+      },
+      support: {
+        eyebrow: "Support",
+        title: "Support",
+        titleTag: "Support · Piyanomini",
+        updated: "Last updated: August 11, 2026",
+        lead: "Support for Piyanomini Ars and Piyanomini Manus is handled by email. Write to us and we usually reply within 1-2 working days.",
+        sections: [
+          { h: "What to include", p: "Tell us which app you are using (Ars or Manus), the app version, your device model and your iOS version. The app version appears near the bottom of the Settings screen, on the line starting with v. If the problem occurs in a particular exercise, add the name of the exercise and the settings you used; being able to reproduce the exact case makes the fix much faster." },
+          { h: "Free trial", p: "Each app can be tried in full for 14 days from first use. No card details are requested during the trial, no automatic charge is made when it ends, and there is no subscription. Once the trial is over you can buy the app and carry on where you left off; your practice history stays on your device." },
+          { h: "Restoring a purchase", p: "If you changed device or reinstalled the app, tap the Restore link on the purchase screen. A purchase is valid on the devices you use with the same Apple account and for members of your Apple Family Sharing group. If restoring does not work, check that the device is signed in to the App Store with the right Apple account, then write to us." },
+          { h: "Microphone and audio", p: "The tuner, intonation and singing exercises request microphone access; if you declined, you can enable it in your device settings. If pitch detection drifts, try a quiet room. Using headphones, so that sound from the speaker does not feed back into the microphone, noticeably improves the result." },
+          { h: "Refunds", p: "Purchases are made through the App Store and handled by Apple, and refund requests go to Apple as well. We have no access to your payment details, so we cannot start a refund on your behalf; you can request one from Apple's refund page." },
+          { h: "Teachers, schools and suggestions", p: "You are welcome to write about classroom use, student groups and institutional questions. Bug reports, gaps you notice in the content and ideas for new exercises reach the same address; the roadmap is shaped largely by this feedback." },
+        ],
+        contactHeading: "Contact",
+        contactText: "For support and any other question:",
       },
     },
   },
