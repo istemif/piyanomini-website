@@ -3,12 +3,13 @@
 // Metinleri buradan düzenle. Modül adları uygulamadan birebir alındı.
 // ============================================================
 
-// Tek CTA: App Store linki. Uygulama yayınlanınca burayı güncelle.
-export const APP_STORE_URL = "https://apps.apple.com/app/piyanomini/id000000000";
+// Tek CTA: App Store linki. Ars 2026-08 itibarıyla yayında.
+// Storefront kodu (/us/, /tr/ ...) bilerek YOK: Apple ziyaretçiyi kendi ülke
+// mağazasına yönlendirsin diye. Ülke kodu eklenirse herkes o mağazaya düşer.
+export const APP_STORE_URL = "https://apps.apple.com/app/piyanomini-ars/id6757364668";
 
-// Ars App Store'da yayımlanınca: yukarıdaki URL'i gerçek linkle değiştir + bunu true yap.
 // false iken tüm App Store butonları tıklanmaz "yakında" durumunda kalır.
-export const APP_STORE_LIVE = false;
+export const APP_STORE_LIVE = true;
 
 export const CONTACT = {
   email: "hello@istemifurkan.com",
