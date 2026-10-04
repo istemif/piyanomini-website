@@ -7,7 +7,7 @@ const appStore = new URL(APP_STORE_URL);
 appStore.searchParams.set("ct", "kulak-testi");
 appStore.searchParams.set("mt", "8");
 
-const bilinenVar = bilinenEzgiler.length >= 4;
+const bilinenVar = bilinenEzgiler.length >= 5;
 const bolumSayisi = bilinenVar ? "dört" : "üç";
 ---
 
@@ -29,7 +29,7 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
       <h1>Müzik kulağınız gerçekten yok mu?</h1>
       <p class="kt-lead">
         "Müzik kulağım yok" diyenlerin çoğu, ölçüldüğünde normal çıkıyor. Bu kısa testte {bolumSayisi} bölüm var ve
-        yaklaşık dört dakika sürüyor. Sesler Piyanomini · Ars'ın piyanosuyla çalınır, ezgiler Ars'ın ezgi üreticisinden gelir.
+        yaklaşık beş dakika sürüyor. Sesler Piyanomini · Ars'ın piyanosuyla çalınır, ezgiler Ars'ın ezgi üreticisinden gelir.
       </p>
       <ul class="kt-list">
         <li><span class="mono">01</span> Kalın ve ince: ikinci nota daha kalın mı, daha ince mi, aynı mı?</li>
@@ -212,8 +212,8 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
 
   // ---------- Bölüm 1: ses yönü (Ars PitchDirection, Do3-Do5) ----------
   function bolum1(): Soru[] {
-    const boyut = [5, 3, 2, 1];
-    const aynıYeri = rnd(3); // tam bir "aynı", ilk üç sorudan birinde; son soru hep yarım ses
+    const boyut = [5, 4, 3, 2, 1];
+    const aynıYeri = rnd(4); // tam bir "aynı", ilk dört sorudan birinde; son soru hep yarım ses
     return boyut.map((b, i) => {
       const yon = i === aynıYeri ? "ayni" : Math.random() < 0.5 ? "yukari" : "asagi";
       const ilk = 52 + rnd(17); // 52-68: ±5 ile 48-72 içinde kalır
@@ -251,8 +251,8 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
   }
   function bolum2(): Soru[] {
     const havuz = arsEzgiler as Ezgi[];
-    const modlar = karistir(["major", "major", "major", "minor"]);
-    const ayniMi = karistir([true, true, false, false]);
+    const modlar = karistir(["major", "major", "major", "major", "minor"]);
+    const ayniMi = karistir([true, true, false, false, Math.random() < 0.5]);
     const sec = (mod: string, haric?: Ezgi) => {
       const aday = havuz.filter((e) => e.mod === mod && !kullanilan.has(e.id) && (!haric || imza(e) !== imza(haric)));
       const e = aday[rnd(aday.length)];
@@ -314,7 +314,7 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
   }
   function bolum3(): Soru[] {
     const havuz = arsEzgiler as Ezgi[];
-    const gecMi = karistir([true, true, false, false]);
+    const gecMi = karistir([true, true, false, false, Math.random() < 0.5]);
     return gecMi.map((gec) => {
       // geciktirilecek nota: ilk iki ve son değil, gecikmeden uzun (en az yarım vuruş)
       const uygunlar = (e: Ezgi) => e.n.map((x, i) => i).filter((i) => i > 1 && i < e.n.length - 1 && e.n[i][0] > 0 && e.n[i][1] >= 0.5);
@@ -358,10 +358,10 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
   }
   function bolum4(): Soru[] {
     const havuz = karistir(bilinenEzgiler as Bilinen[]);
-    if (havuz.length < 4) return [];
-    const bozuklar = karistir([true, true, false, false]);
-    bilinenKalan = havuz.slice(4);
-    return havuz.slice(0, 4).map((e, i) => bilinenSoru(e, bozuklar[i]));
+    if (havuz.length < 5) return [];
+    const bozuklar = karistir([true, true, false, false, Math.random() < 0.5]);
+    bilinenKalan = havuz.slice(5);
+    return havuz.slice(0, 5).map((e, i) => bilinenSoru(e, bozuklar[i]));
   }
 
   // ---------- Akış ----------
@@ -460,8 +460,9 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
       return { dogru: c.filter((x) => x.dogru).length, toplam: c.length };
     };
     const p1 = puan(1), p2 = puan(2), p3 = puan(3), p4 = puan(4);
-    const yarimSes = cevaplar.filter((x) => x.bolum === 1)[3]?.dogru === true; // 4. soru: yarım ses
-    const iyi = p1.dogru >= 3 && p2.dogru >= 3 && p3.dogru >= 3 && (p4.toplam === 0 || p4.dogru >= p4.toplam - 1);
+    const yarimSes = cevaplar.filter((x) => x.bolum === 1)[4]?.dogru === true; // 5. soru: yarım ses
+    // Eşik 4/5: 2 seçenekli bölümde rastgele basan %19, 3 seçeneklide %4,5 ihtimalle ulaşır; 3/5 = %50 (anlamsız)
+    const iyi = p1.dogru >= 4 && p2.dogru >= 4 && p3.dogru >= 4 && (p4.toplam === 0 || p4.dogru >= p4.toplam - 1);
 
     $("[data-r-baslik]").textContent = iyi ? "Kulağınız büyük ihtimalle yerinde." : "Bu kısa test kesin bir şey söylemez.";
     $("[data-r-metin]").textContent = iyi
