@@ -327,7 +327,6 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
   let sorular: Soru[] = [];
   let sira = 0;
   const cevaplar: { bolum: number; dogru: boolean | null }[] = [];
-  let calmaBitis = 0;
 
   function ekran(ad: string) {
     document.querySelectorAll<HTMLElement>("[data-screen]").forEach((el) => (el.hidden = el.dataset.screen !== ad));
@@ -351,24 +350,24 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
       d.style.clipPath = "inset(0 0 0 0)";
     }, gecikme * 1000));
   }
-  async function cal() {
+  // Çalanı ve zamanlanmış her şeyi (dolgu, etiket) durdurur; cevap ses bitmeden verilebilir.
+  function durdur() {
     sustur();
-    await sesiUyandir();
-    $("[data-q-not]").hidden = true;
     etiketZamanlayicilar.forEach(clearTimeout);
     etiketZamanlayicilar = [];
+  }
+  async function cal() {
+    durdur();
+    await sesiUyandir();
+    $("[data-q-not]").hidden = true;
     const ikiEzgi = sorular[sira].bolum === 2;
     ($("[data-q-gosterge]") as HTMLElement).hidden = !ikiEzgi;
     $("[data-q-calan]").textContent = ikiEzgi ? "" : "Çalıyor";
     gostergeSifirla();
     void dolgu(1).offsetWidth; // sıfırlamanın geçişsiz uygulanması için
     const sure = sorular[sira].cal();
-    calmaBitis = performance.now() + sure * 1000;
-    const butonlar = document.querySelectorAll<HTMLButtonElement>("[data-q-cevaplar] button");
-    butonlar.forEach((b) => (b.disabled = true));
     etiketZamanlayicilar.push(window.setTimeout(() => {
       $("[data-q-calan]").textContent = "";
-      butonlar.forEach((b) => (b.disabled = false));
     }, sure * 1000 + 200));
   }
   function soruGoster() {
@@ -396,7 +395,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
   }
   function cevapla(deger: string) {
     const s = sorular[sira];
-    sustur();
+    durdur();
     if (s.bolum === 3 && deger === "duymadim") {
       // Puana sayılmaz; havuzdan başka bir ezgi aynı rolle gelir.
       cevaplar.push({ bolum: 3, dogru: null });
@@ -482,7 +481,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
         baslat();
         break;
       case "tekrar-dinle":
-        if (performance.now() >= calmaBitis) cal();
+        cal();
         break;
       case "yeniden":
         baslat();
@@ -492,6 +491,11 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
 </script>
 
 <style>
+  /* Üst bar zaten çizgiyle ayrılıyor; soru etiketinin kendi üst çizgisi çift çizgi yapar */
+  .kt .sec-label {
+    border-top: 0;
+    padding-top: 0;
+  }
   .kt-bar {
     display: flex;
     justify-content: space-between;
@@ -616,13 +620,9 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     cursor: pointer;
     transition: background 0.14s ease, color 0.14s ease;
   }
-  .kt-answers :global(.kt-answer:hover:not(:disabled)) {
+  .kt-answers :global(.kt-answer:hover) {
     background: var(--fg);
     color: var(--bg);
-  }
-  .kt-answers :global(.kt-answer:disabled) {
-    color: var(--muted);
-    cursor: default;
   }
   .kt-answers :global(.kt-answer-minor) {
     grid-column: 1 / -1;
