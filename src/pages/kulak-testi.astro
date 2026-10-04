@@ -65,6 +65,10 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
       <h2 data-q-baslik></h2>
       <p class="kt-lead" data-q-aciklama></p>
       <p class="mono muted kt-playing" data-q-calan aria-live="polite"></p>
+      <div class="kt-gosterge" data-q-gosterge hidden aria-hidden="true">
+        <span data-g="1">1. ezgi</span>
+        <span data-g="2">2. ezgi</span>
+      </div>
       <p class="kt-note" data-q-not hidden>Ses kesildiyse "Tekrar dinle"ye basın.</p>
       <div class="kt-answers" data-q-cevaplar></div>
       <div class="kt-actions">
@@ -270,11 +274,13 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
         dogru: ayniMi[i] ? "ayni" : "farkli",
         cal: () => {
           const t = ctx!.currentTime + 0.1;
+          const ARA = 1.6; // iki ezgi arası sessizlik
           const s1 = ezgiCal(a.n, t, kaydir, vurusSn);
-          etiketGoster("1. ezgi", 0);
-          etiketGoster("2. ezgi", s1 + 1.2);
-          const s2 = ezgiCal(b.n, t + s1 + 1.2, kaydir, vurusSn);
-          return s1 + 1.2 + s2;
+          gosterge(1, 0);
+          gosterge(0, s1 + 0.2);
+          gosterge(2, s1 + ARA);
+          const s2 = ezgiCal(b.n, t + s1 + ARA, kaydir, vurusSn);
+          return s1 + ARA + s2;
         },
       };
     });
@@ -329,8 +335,13 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     window.scrollTo({ top: 0 });
   }
   let etiketZamanlayicilar: number[] = [];
-  function etiketGoster(metin: string, gecikme: number) {
-    etiketZamanlayicilar.push(window.setTimeout(() => ($("[data-q-calan]").textContent = metin), gecikme * 1000));
+  // Bölüm 2: hangi ezginin çaldığı iki büyük kutuyla gösterilir (0 = arada, hiçbiri)
+  function gosterge(hangi: 0 | 1 | 2, gecikme: number) {
+    etiketZamanlayicilar.push(window.setTimeout(() => {
+      document.querySelectorAll<HTMLElement>("[data-q-gosterge] [data-g]").forEach((el) => {
+        el.classList.toggle("is-on", el.dataset.g === String(hangi));
+      });
+    }, gecikme * 1000));
   }
   async function cal() {
     sustur();
@@ -338,13 +349,17 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     $("[data-q-not]").hidden = true;
     etiketZamanlayicilar.forEach(clearTimeout);
     etiketZamanlayicilar = [];
-    $("[data-q-calan]").textContent = "Çalıyor";
+    const ikiEzgi = sorular[sira].bolum === 2;
+    ($("[data-q-gosterge]") as HTMLElement).hidden = !ikiEzgi;
+    $("[data-q-calan]").textContent = ikiEzgi ? "" : "Çalıyor";
+    gosterge(0, 0);
     const sure = sorular[sira].cal();
     calmaBitis = performance.now() + sure * 1000;
     const butonlar = document.querySelectorAll<HTMLButtonElement>("[data-q-cevaplar] button");
     butonlar.forEach((b) => (b.disabled = true));
     etiketZamanlayicilar.push(window.setTimeout(() => {
       $("[data-q-calan]").textContent = "";
+      gosterge(0, 0);
       butonlar.forEach((b) => (b.disabled = false));
     }, sure * 1000 + 200));
   }
@@ -541,6 +556,26 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
   }
   .kt-playing {
     min-height: 1.5em;
+  }
+  .kt-gosterge {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--rule);
+  }
+  .kt-gosterge span {
+    padding: 22px 12px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .kt-gosterge span + span {
+    border-left: 1px solid var(--rule);
+  }
+  .kt-gosterge span.is-on {
+    background: var(--fg);
+    color: var(--bg);
   }
   .kt-answers {
     display: grid;
