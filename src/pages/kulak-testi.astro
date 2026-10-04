@@ -224,7 +224,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
   function ezgiCal(notalar: [number, number][], t0: number, kaydir: number, vurusSn: number) {
     let t = t0;
     for (const [midi, vurus] of notalar) {
-      nota(midi + kaydir, t, vurus * vurusSn * 0.95);
+      if (midi > 0) nota(midi + kaydir, t, vurus * vurusSn * 0.95); // 0 = sus
       t += vurus * vurusSn;
     }
     return t - t0;
@@ -270,7 +270,8 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
   const DIZI = { major: [0, 2, 4, 5, 7, 9, 11], minor: [0, 2, 3, 5, 7, 8, 10, 11] };
   function boz(e: Bilinen): [number, number][] {
     const n = e.n.map((x) => [x[0], x[1]] as [number, number]);
-    const i = 1 + rnd(n.length - 2); // ilk ve son nota değişmez (MBEA)
+    const ic = n.map((x, k) => k).filter((k) => k > 0 && k < n.length - 1 && n[k][0] > 0);
+    const i = ic[rnd(ic.length)]; // ilk ve son nota, susla birlikte değişmez (MBEA)
     const dizi = DIZI[e.mod];
     const adaylar = [1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6].filter(
       (k) => !dizi.includes((((n[i][0] + k - e.tonik) % 12) + 12) % 12),
@@ -339,8 +340,10 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     $("[data-q-sayac]").textContent = `${bolumSirasi} / ${bolumSorulari.length}`;
     $("[data-q-baslik]").textContent = s.baslik;
     $("[data-q-aciklama]").textContent = s.aciklama;
-    const kutu = $("[data-q-cevaplar]");
+    const kutu = $<HTMLElement>("[data-q-cevaplar]");
     kutu.innerHTML = "";
+    const ana = s.secenekler.filter((o) => o.deger !== "duymadim").length;
+    kutu.style.gridTemplateColumns = `repeat(${ana}, 1fr)`;
     s.secenekler.forEach((o) => {
       const b = document.createElement("button");
       b.type = "button";
