@@ -34,7 +34,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
       <ul class="kt-list">
         <li><span class="mono">01</span> Kalın ve ince: ikinci nota daha kalın mı, daha ince mi, aynı mı?</li>
         <li><span class="mono">02</span> Ezgi: iki ezgi aynı mı, farklı mı?</li>
-        {ucuncuBolum && <li><span class="mono">03</span> Bilinen ezgi: doğru mu çalındı, bozuk mu?</li>}
+        {ucuncuBolum && <li><span class="mono">03</span> Bilinen ezgi: yanlış bir nota var mı?</li>}
       </ul>
       <p class="kt-note">
         <strong>Bu bir teşhis testi değildir.</strong> Fikir verir. Kulaklıkla, sessiz bir yerde çözün. iPhone'da sessiz
@@ -303,11 +303,11 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     const notalar = bozuk ? boz(e) : e.n;
     return {
       bolum: 3,
-      baslik: `"${e.ad}" doğru mu çalındı, bozuk mu?`,
-      aciklama: "Bildiğiniz bir ezgi çalınacak. Bazılarında yanlış bir nota var.",
+      baslik: `"${e.ad}" ezgisinde yanlış bir nota var mı?`,
+      aciklama: "Ritmi hatırladığınızdan farklı olabilir, ona bakmayın. Yalnızca notalara dikkat edin.",
       secenekler: [
-        { deger: "dogru", etiket: "Doğru" },
-        { deger: "bozuk", etiket: "Bozuk" },
+        { deger: "dogru", etiket: "Notalar doğru" },
+        { deger: "bozuk", etiket: "Yanlış nota var" },
         { deger: "duymadim", etiket: "Bu ezgiyi hiç duymadım" },
       ],
       dogru: bozuk ? "bozuk" : "dogru",
