@@ -14,7 +14,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
 <Base
   lang="tr"
   title="Kulak testi · Piyanomini"
-  description="Birkaç dakikalık ücretsiz kulak testi: ses yönü ve ezgi ayırt etme. Piyanomini · Ars'ın ses ve ezgi üreticisiyle."
+  description="Birkaç dakikalık ücretsiz kulak testi: kalın ve ince sesi, ezgileri ayırt etme. Piyanomini · Ars'ın ses ve ezgi üreticisiyle."
   canonicalPath="/kulak-testi"
 >
   <header class="kt-bar wrap">
@@ -32,7 +32,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
         yaklaşık üç dakika sürüyor. Sesler Piyanomini · Ars'ın piyanosuyla çalınır, ezgiler Ars'ın ezgi üreticisinden gelir.
       </p>
       <ul class="kt-list">
-        <li><span class="mono">01</span> Ses yönü: ikinci nota yukarı mı, aşağı mı, aynı mı?</li>
+        <li><span class="mono">01</span> Kalın ve ince: ikinci nota daha kalın mı, daha ince mi, aynı mı?</li>
         <li><span class="mono">02</span> Ezgi: iki ezgi aynı mı, farklı mı?</li>
         {ucuncuBolum && <li><span class="mono">03</span> Bilinen ezgi: doğru mu çalındı, bozuk mu?</li>}
       </ul>
@@ -97,7 +97,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
       <div class="kt-next">
         <p class="mono muted">Sonraki adım</p>
         <p>
-          Bu testteki ses yönü ve ezgi alıştırmaları Piyanomini · Ars'ta, ayarlarını sizin seçtiğiniz sınırsız soruyla
+          Bu testteki alıştırmalar Piyanomini · Ars'ta, ayarlarını sizin seçtiğiniz sınırsız soruyla
           var. 14 gün ücretsiz, sonra tek seferlik satın alma.
         </p>
         <div class="kt-actions">
@@ -207,7 +207,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     bilinen?: Bilinen;
   };
 
-  const BOLUM_ADI: Record<number, string> = { 1: "Bölüm 1 · Ses yönü", 2: "Bölüm 2 · Ezgi", 3: "Bölüm 3 · Bilinen ezgi" };
+  const BOLUM_ADI: Record<number, string> = { 1: "Bölüm 1 · Kalın ve ince", 2: "Bölüm 2 · Ezgi", 3: "Bölüm 3 · Bilinen ezgi" };
 
   // ---------- Bölüm 1: ses yönü (Ars PitchDirection, Do3-Do5) ----------
   function bolum1(): Soru[] {
@@ -219,12 +219,12 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
       const ikinci = yon === "ayni" ? ilk : yon === "yukari" ? ilk + b : ilk - b;
       return {
         bolum: 1,
-        baslik: "İkinci nota yukarı mı, aşağı mı, aynı mı?",
+        baslik: "İkinci nota daha kalın mı, daha ince mi, aynı mı?",
         aciklama: "İki nota art arda çalınacak.",
         secenekler: [
-          { deger: "asagi", etiket: "Aşağı" },
+          { deger: "asagi", etiket: "Kalın" },
           { deger: "ayni", etiket: "Aynı" },
-          { deger: "yukari", etiket: "Yukarı" },
+          { deger: "yukari", etiket: "İnce" },
         ],
         dogru: yon,
         cal: () => {
@@ -430,7 +430,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
           : "Ezgileri ayırt ettiniz. Yarım ses sorusunda zorlandıysanız tekrar deneyin: en küçük adım, dikkat de ister.")
       : "Telefon hoparlörü, ortam gürültüsü, dikkat ya da alışkanlık sonucu değiştirebilir. Kulaklıkla, sessiz bir yerde tekrar deneyin. Merak ediyorsanız aşağıdaki bilimsel test daha güvenilir.";
 
-    const satirlar: [string, { dogru: number; toplam: number }][] = [["Ses yönü", p1], ["Ezgi", p2]];
+    const satirlar: [string, { dogru: number; toplam: number }][] = [["Kalın ve ince", p1], ["Ezgi", p2]];
     if (p3.toplam > 0) satirlar.push(["Bilinen ezgi", p3]);
     $("[data-r-puanlar]").innerHTML = satirlar
       .map(([ad, p]) => `<div><dt>${ad}</dt><dd class="mono">${p.dogru} / ${p.toplam}</dd></div>`)
