@@ -26,9 +26,9 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     <!-- Giriş -->
     <section class="kt-screen" data-screen="giris">
       <p class="mono muted kt-eyebrow">Kulak testi</p>
-      <h1>Kulağınız gerçekten yok mu?</h1>
+      <h1>Müzik kulağınız gerçekten yok mu?</h1>
       <p class="kt-lead">
-        Kendini "kulaksız" sayanların çoğu, ölçüldüğünde normal çıkıyor. Bu kısa testte {bolumSayisi} bölüm var ve
+        "Müzik kulağım yok" diyenlerin çoğu, ölçüldüğünde normal çıkıyor. Bu kısa testte {bolumSayisi} bölüm var ve
         yaklaşık üç dakika sürüyor. Sesler Piyanomini · Ars'ın piyanosuyla çalınır, ezgiler Ars'ın ezgi üreticisinden gelir.
       </p>
       <ul class="kt-list">
@@ -85,11 +85,11 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
 
       <div class="kt-facts">
         <p>
-          Kendini kulaksız sayan 100 üniversite öğrencisi standart müzik algı testine girdi: 89'u normal çıktı.
+          Kendinde müzik kulağı olmadığını düşünen 100 üniversite öğrencisi standart müzik algı testine girdi: 89'u normal çıktı.
           <span class="mono muted">Cuddy ve ark., 2005</span>
         </p>
         <p>
-          Gerçek doğuştan kulaksızlık (konjenital amüzi), 16.000'den fazla kişiyle yapılan en büyük ölçümde yaklaşık
+          Doğuştan müzik kulağı olmaması (konjenital amüzi), 16.000'den fazla kişiyle yapılan en büyük ölçümde yaklaşık
           yüzde bir buçuk. <span class="mono muted">Peretz ve Vuvan, 2017</span>
         </p>
       </div>
@@ -425,7 +425,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     $("[data-r-baslik]").textContent = iyi ? "Kulağınız büyük ihtimalle yerinde." : "Bu kısa test kesin bir şey söylemez.";
     $("[data-r-metin]").textContent = iyi
       ? (yarimSes
-          ? "Müzikteki en küçük adımı, yarım sesi de duydunuz. Gerçek doğuştan kulaksızlarda en çok zorlanılan fark bu."
+          ? "Müzikteki en küçük adımı, yarım sesi de duydunuz. Doğuştan müzik kulağı olmayanların en çok zorlandığı fark bu."
           : "Ezgileri ayırt ettiniz. Yarım ses sorusunda zorlandıysanız tekrar deneyin: en küçük adım, dikkat de ister.")
       : "Telefon hoparlörü, ortam gürültüsü, dikkat ya da alışkanlık sonucu değiştirebilir. Kulaklıkla, sessiz bir yerde tekrar deneyin. Merak ediyorsanız aşağıdaki bilimsel test daha güvenilir.";
 
