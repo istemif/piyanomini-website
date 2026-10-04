@@ -66,8 +66,8 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
       <p class="kt-lead" data-q-aciklama></p>
       <p class="mono muted kt-playing" data-q-calan aria-live="polite"></p>
       <div class="kt-gosterge" data-q-gosterge hidden aria-hidden="true">
-        <span data-g="1">1. ezgi</span>
-        <span data-g="2">2. ezgi</span>
+        <span data-g="1"><span class="kt-dolgu">1. ezgi</span>1. ezgi</span>
+        <span data-g="2"><span class="kt-dolgu">2. ezgi</span>2. ezgi</span>
       </div>
       <p class="kt-note" data-q-not hidden>Ses kesildiyse "Tekrar dinle"ye basın.</p>
       <div class="kt-answers" data-q-cevaplar></div>
@@ -276,10 +276,9 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
           const t = ctx!.currentTime + 0.1;
           const ARA = 1.6; // iki ezgi arası sessizlik
           const s1 = ezgiCal(a.n, t, kaydir, vurusSn);
-          gosterge(1, 0);
-          gosterge(0, s1 + 0.2);
-          gosterge(2, s1 + ARA);
           const s2 = ezgiCal(b.n, t + s1 + ARA, kaydir, vurusSn);
+          doldur(1, 0.1, s1);
+          doldur(2, 0.1 + s1 + ARA, s2);
           return s1 + ARA + s2;
         },
       };
@@ -335,12 +334,21 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     window.scrollTo({ top: 0 });
   }
   let etiketZamanlayicilar: number[] = [];
-  // Bölüm 2: hangi ezginin çaldığı iki büyük kutuyla gösterilir (0 = arada, hiçbiri)
-  function gosterge(hangi: 0 | 1 | 2, gecikme: number) {
+  // Bölüm 2: her kutu kendi ezgisi boyunca soldan sağa dolar (ilerleme çubuğu)
+  const dolgu = (hangi: 1 | 2) =>
+    document.querySelector<HTMLElement>(`[data-q-gosterge] [data-g="${hangi}"] .kt-dolgu`)!;
+  function gostergeSifirla() {
+    ([1, 2] as const).forEach((h) => {
+      const d = dolgu(h);
+      d.style.transition = "none";
+      d.style.clipPath = "inset(0 100% 0 0)";
+    });
+  }
+  function doldur(hangi: 1 | 2, gecikme: number, sure: number) {
     etiketZamanlayicilar.push(window.setTimeout(() => {
-      document.querySelectorAll<HTMLElement>("[data-q-gosterge] [data-g]").forEach((el) => {
-        el.classList.toggle("is-on", el.dataset.g === String(hangi));
-      });
+      const d = dolgu(hangi);
+      d.style.transition = `clip-path ${sure}s linear`;
+      d.style.clipPath = "inset(0 0 0 0)";
     }, gecikme * 1000));
   }
   async function cal() {
@@ -352,14 +360,14 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     const ikiEzgi = sorular[sira].bolum === 2;
     ($("[data-q-gosterge]") as HTMLElement).hidden = !ikiEzgi;
     $("[data-q-calan]").textContent = ikiEzgi ? "" : "Çalıyor";
-    gosterge(0, 0);
+    gostergeSifirla();
+    void dolgu(1).offsetWidth; // sıfırlamanın geçişsiz uygulanması için
     const sure = sorular[sira].cal();
     calmaBitis = performance.now() + sure * 1000;
     const butonlar = document.querySelectorAll<HTMLButtonElement>("[data-q-cevaplar] button");
     butonlar.forEach((b) => (b.disabled = true));
     etiketZamanlayicilar.push(window.setTimeout(() => {
       $("[data-q-calan]").textContent = "";
-      gosterge(0, 0);
       butonlar.forEach((b) => (b.disabled = false));
     }, sure * 1000 + 200));
   }
@@ -562,20 +570,31 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     grid-template-columns: 1fr 1fr;
     border: 1px solid var(--rule);
   }
-  .kt-gosterge span {
+  .kt-gosterge[hidden] {
+    display: none;
+  }
+  .kt-gosterge [data-g] {
+    position: relative;
+    overflow: hidden;
     padding: 22px 12px;
     text-align: center;
     font-size: 22px;
     font-weight: 600;
     color: var(--muted);
-    transition: background 0.12s ease, color 0.12s ease;
   }
-  .kt-gosterge span + span {
+  .kt-gosterge [data-g] + [data-g] {
     border-left: 1px solid var(--rule);
   }
-  .kt-gosterge span.is-on {
+  /* Dolan kısım: aynı yazının ters renkli kopyası, soldan sağa açılır */
+  .kt-dolgu {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: var(--fg);
     color: var(--bg);
+    clip-path: inset(0 100% 0 0);
   }
   .kt-answers {
     display: grid;
