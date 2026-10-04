@@ -1,0 +1,579 @@
+---
+import Base from "../layouts/Base.astro";
+import { APP_STORE_URL } from "../i18n/content";
+import bilinenEzgiler from "../data/kulak-testi/bilinen-ezgiler.json";
+
+const appStore = new URL(APP_STORE_URL);
+appStore.searchParams.set("ct", "kulak-testi");
+appStore.searchParams.set("mt", "8");
+
+const ucuncuBolum = bilinenEzgiler.length >= 4;
+const bolumSayisi = ucuncuBolum ? "üç" : "iki";
+---
+
+<Base
+  lang="tr"
+  title="Kulak testi · Piyanomini"
+  description="Birkaç dakikalık ücretsiz kulak testi: ses yönü ve ezgi ayırt etme. Piyanomini · Ars'ın ses ve ezgi üreticisiyle."
+  canonicalPath="/kulak-testi"
+>
+  <header class="kt-bar wrap">
+    <a class="kt-brand" href="/">Piyanomini</a>
+    <span class="mono muted">Kulak testi</span>
+  </header>
+
+  <main id="main" class="wrap kt">
+    <!-- Giriş -->
+    <section class="kt-screen" data-screen="giris">
+      <p class="mono muted kt-eyebrow">Kulak testi</p>
+      <h1>Kulağınız gerçekten yok mu?</h1>
+      <p class="kt-lead">
+        Kendini "kulaksız" sayanların çoğu, ölçüldüğünde normal çıkıyor. Bu kısa testte {bolumSayisi} bölüm var ve
+        yaklaşık üç dakika sürüyor. Sesler Piyanomini · Ars'ın piyanosuyla çalınır, ezgiler Ars'ın ezgi üreticisinden gelir.
+      </p>
+      <ul class="kt-list">
+        <li><span class="mono">01</span> Ses yönü: ikinci nota yukarı mı, aşağı mı, aynı mı?</li>
+        <li><span class="mono">02</span> Ezgi: iki ezgi aynı mı, farklı mı?</li>
+        {ucuncuBolum && <li><span class="mono">03</span> Bilinen ezgi: doğru mu çalındı, bozuk mu?</li>}
+      </ul>
+      <p class="kt-note">
+        <strong>Bu bir teşhis testi değildir.</strong> Fikir verir. Kulaklıkla, sessiz bir yerde çözün. iPhone'da sessiz
+        modu kapatın.
+      </p>
+      <div class="kt-actions">
+        <button class="cta" type="button" data-action="ses-kontrol">Ses kontrolü</button>
+      </div>
+      <p class="kt-status mono muted" data-status hidden></p>
+    </section>
+
+    <!-- Ses kontrolü -->
+    <section class="kt-screen" data-screen="kontrol" hidden>
+      <p class="mono muted kt-eyebrow">Ses kontrolü</p>
+      <h2>Bu notayı rahatça duyuyor musunuz?</h2>
+      <div class="kt-actions">
+        <button class="cta" type="button" data-action="basla">Duyuyorum, başla</button>
+        <button class="kt-link" type="button" data-action="kontrol-tekrar">Tekrar çal</button>
+      </div>
+    </section>
+
+    <!-- Soru -->
+    <section class="kt-screen" data-screen="soru" hidden>
+      <div class="sec-label mono">
+        <span class="l" data-q-bolum></span>
+        <span data-q-sayac></span>
+      </div>
+      <h2 data-q-baslik></h2>
+      <p class="kt-lead" data-q-aciklama></p>
+      <p class="mono muted kt-playing" data-q-calan aria-live="polite"></p>
+      <div class="kt-answers" data-q-cevaplar></div>
+      <div class="kt-actions">
+        <button class="kt-link" type="button" data-action="tekrar-dinle">Tekrar dinle</button>
+      </div>
+    </section>
+
+    <!-- Sonuç -->
+    <section class="kt-screen" data-screen="sonuc" hidden>
+      <p class="mono muted kt-eyebrow">Sonuç</p>
+      <h2 data-r-baslik></h2>
+      <p class="kt-lead" data-r-metin></p>
+      <dl class="kt-scores" data-r-puanlar></dl>
+
+      <div class="kt-facts">
+        <p>
+          Kendini kulaksız sayan 100 üniversite öğrencisi standart müzik algı testine girdi: 89'u normal çıktı.
+          <span class="mono muted">Cuddy ve ark., 2005</span>
+        </p>
+        <p>
+          Gerçek doğuştan kulaksızlık (konjenital amüzi), 16.000'den fazla kişiyle yapılan en büyük ölçümde yaklaşık
+          yüzde bir buçuk. <span class="mono muted">Peretz ve Vuvan, 2017</span>
+        </p>
+      </div>
+
+      <div class="kt-next">
+        <p class="mono muted">Sonraki adım</p>
+        <p>
+          Bu testteki ses yönü ve ezgi alıştırmaları Piyanomini · Ars'ta, ayarlarını sizin seçtiğiniz sınırsız soruyla
+          var. 14 gün ücretsiz, sonra tek seferlik satın alma.
+        </p>
+        <div class="kt-actions">
+          <a class="cta" href={appStore.toString()} target="_blank" rel="noopener">Ars'ı App Store'dan indir</a>
+          <button class="kt-link" type="button" data-action="yeniden">Testi yeniden çöz</button>
+        </div>
+      </div>
+
+      <p class="kt-note" data-r-resmi hidden>
+        Daha güvenilir bir ölçüm için: Montreal Üniversitesi'nden Isabelle Peretz'in laboratuvarının
+        <a href="https://peretzlab.ca/online-test-material/online-test/" target="_blank" rel="noopener">çevrimiçi testi</a>
+        (İngilizce ya da Fransızca, yaklaşık 25 dakika).
+      </p>
+    </section>
+  </main>
+</Base>
+
+<script>
+  import arsEzgiler from "../data/kulak-testi/ars-ezgiler.json";
+  import bilinenEzgiler from "../data/kulak-testi/bilinen-ezgiler.json";
+
+  // ---------- Ses: Ars'ın piyanosu (FreePats Upright Piano KW, vL, CC0) ----------
+  // UprightPianoKW-vL.aupreset ile aynı eşleme: her sample kökünün ±1 yarım sesini
+  // oynatma hızıyla karşılar; release 0,6 sn; vuruş gücü Ars'taki gibi 0,7.
+  const ZONES: Record<number, string> = {
+    48: "C3", 51: "Ds3", 54: "Fs3", 57: "A3", 60: "C4", 63: "Ds4", 66: "Fs4",
+    69: "A4", 72: "C5", 75: "Ds5", 78: "Fs5", 81: "A5", 84: "C6",
+  };
+  const ROOTS = Object.keys(ZONES).map(Number);
+  const RELEASE = 0.6;
+  const VELOCITY = 0.7;
+  let ctx: AudioContext | null = null;
+  const buffers = new Map<number, AudioBuffer>();
+  const live: AudioBufferSourceNode[] = [];
+
+  async function sesHazirla() {
+    if (!ctx) {
+      // iOS 17+: sessiz moddayken de çalsın
+      const nav = navigator as Navigator & { audioSession?: { type: string } };
+      if (nav.audioSession) nav.audioSession.type = "playback";
+      ctx = new AudioContext();
+    }
+    if (ctx.state === "suspended") await ctx.resume();
+    if (buffers.size === ROOTS.length) return;
+    await Promise.all(
+      ROOTS.map(async (root) => {
+        const res = await fetch(`/kulak-testi/piano/${ZONES[root]}.m4a`);
+        const buf = await ctx!.decodeAudioData(await res.arrayBuffer());
+        buffers.set(root, buf);
+      }),
+    );
+  }
+
+  function nota(midi: number, when: number, dur: number) {
+    if (!ctx) return;
+    const root = ROOTS.reduce((a, b) => (Math.abs(b - midi) < Math.abs(a - midi) ? b : a));
+    const src = ctx.createBufferSource();
+    src.buffer = buffers.get(root)!;
+    src.playbackRate.value = Math.pow(2, (midi - root) / 12);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(VELOCITY, when);
+    g.gain.setValueAtTime(VELOCITY, when + dur);
+    g.gain.setTargetAtTime(0, when + dur, RELEASE / 4);
+    src.connect(g).connect(ctx.destination);
+    src.start(when);
+    src.stop(when + dur + RELEASE + 0.1);
+    live.push(src);
+  }
+
+  function sustur() {
+    while (live.length) {
+      try { live.pop()!.stop(); } catch { /* zaten bitti */ }
+    }
+  }
+
+  // ---------- Yardımcılar ----------
+  const rnd = (n: number) => Math.floor(Math.random() * n);
+  const karistir = <T,>(a: T[]) => {
+    const b = a.slice();
+    for (let i = b.length - 1; i > 0; i--) { const j = rnd(i + 1); [b[i], b[j]] = [b[j], b[i]]; }
+    return b;
+  };
+  const $ = <T extends Element>(s: string) => document.querySelector(s) as T;
+
+  type Ezgi = { id: string; mod: string; tonik: number; n: [number, number][] };
+  type Bilinen = { id: string; ad: string; mod: "major" | "minor"; tonik: number; bpm: number; n: [number, number][] };
+  type Soru = {
+    bolum: 1 | 2 | 3;
+    baslik: string;
+    aciklama: string;
+    secenekler: { deger: string; etiket: string }[];
+    dogru: string;
+    cal: () => number; // çalma süresi (sn)
+    bilinen?: Bilinen;
+  };
+
+  const BOLUM_ADI: Record<number, string> = { 1: "Bölüm 1 · Ses yönü", 2: "Bölüm 2 · Ezgi", 3: "Bölüm 3 · Bilinen ezgi" };
+
+  // ---------- Bölüm 1: ses yönü (Ars PitchDirection, Do3-Do5) ----------
+  function bolum1(): Soru[] {
+    const boyut = [5, 3, 2, 1];
+    const aynıYeri = rnd(3); // tam bir "aynı", ilk üç sorudan birinde; son soru hep yarım ses
+    return boyut.map((b, i) => {
+      const yon = i === aynıYeri ? "ayni" : Math.random() < 0.5 ? "yukari" : "asagi";
+      const ilk = 52 + rnd(17); // 52-68: ±5 ile 48-72 içinde kalır
+      const ikinci = yon === "ayni" ? ilk : yon === "yukari" ? ilk + b : ilk - b;
+      return {
+        bolum: 1,
+        baslik: "İkinci nota yukarı mı, aşağı mı, aynı mı?",
+        aciklama: "İki nota art arda çalınacak.",
+        secenekler: [
+          { deger: "asagi", etiket: "Aşağı" },
+          { deger: "ayni", etiket: "Aynı" },
+          { deger: "yukari", etiket: "Yukarı" },
+        ],
+        dogru: yon,
+        cal: () => {
+          const t = ctx!.currentTime + 0.1;
+          nota(ilk, t, 1.4); // Ars: ilk nota çalmaya devam ederken ikinci 0,5 sn sonra
+          nota(ikinci, t + 0.5, 1.4);
+          return 2.0;
+        },
+      };
+    });
+  }
+
+  // ---------- Bölüm 2: Ars ezgileri, aynı mı farklı mı (3 majör + 1 minör) ----------
+  const imza = (e: Ezgi) => e.n.map((x) => x[0]).join(",");
+  function ezgiCal(notalar: [number, number][], t0: number, kaydir: number, vurusSn: number) {
+    let t = t0;
+    for (const [midi, vurus] of notalar) {
+      nota(midi + kaydir, t, vurus * vurusSn * 0.95);
+      t += vurus * vurusSn;
+    }
+    return t - t0;
+  }
+  function bolum2(): Soru[] {
+    const havuz = arsEzgiler as Ezgi[];
+    const modlar = karistir(["major", "major", "major", "minor"]);
+    const ayniMi = karistir([true, true, false, false]);
+    const kullanilan = new Set<string>();
+    const sec = (mod: string, haric?: Ezgi) => {
+      const aday = havuz.filter((e) => e.mod === mod && !kullanilan.has(e.id) && (!haric || imza(e) !== imza(haric)));
+      const e = aday[rnd(aday.length)];
+      kullanilan.add(e.id);
+      return e;
+    };
+    return modlar.map((mod, i) => {
+      const a = sec(mod);
+      const b = ayniMi[i] ? a : sec(mod, a);
+      const kaydir = rnd(10) - 5; // iki ezgi aynı tona taşınır (-5..+4 yarım ses)
+      const vurusSn = 60 / 80; // Ars melodi diktesi: tempo 80
+      return {
+        bolum: 2,
+        baslik: "İki ezgi aynı mı, farklı mı?",
+        aciklama: "Aynı tonda, aynı uzunlukta iki ezgi art arda çalınacak.",
+        secenekler: [
+          { deger: "ayni", etiket: "Aynı" },
+          { deger: "farkli", etiket: "Farklı" },
+        ],
+        dogru: ayniMi[i] ? "ayni" : "farkli",
+        cal: () => {
+          const t = ctx!.currentTime + 0.1;
+          const s1 = ezgiCal(a.n, t, kaydir, vurusSn);
+          etiketGoster("1. ezgi", 0);
+          etiketGoster("2. ezgi", s1 + 1.2);
+          const s2 = ezgiCal(b.n, t + s1 + 1.2, kaydir, vurusSn);
+          return s1 + 1.2 + s2;
+        },
+      };
+    });
+  }
+
+  // ---------- Bölüm 3: bilinen ezgiler (10'luk havuzdan 4; 2 bozuk, 2 sağlam) ----------
+  const DIZI = { major: [0, 2, 4, 5, 7, 9, 11], minor: [0, 2, 3, 5, 7, 8, 10, 11] };
+  function boz(e: Bilinen): [number, number][] {
+    const n = e.n.map((x) => [x[0], x[1]] as [number, number]);
+    const i = 1 + rnd(n.length - 2); // ilk ve son nota değişmez (MBEA)
+    const dizi = DIZI[e.mod];
+    const adaylar = [1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6].filter(
+      (k) => !dizi.includes((((n[i][0] + k - e.tonik) % 12) + 12) % 12),
+    );
+    n[i][0] += adaylar[rnd(adaylar.length)]; // tona ait olmayan "saçma" nota
+    return n;
+  }
+  let bilinenKalan: Bilinen[] = [];
+  function bilinenSoru(e: Bilinen, bozuk: boolean): Soru {
+    const notalar = bozuk ? boz(e) : e.n;
+    return {
+      bolum: 3,
+      baslik: `"${e.ad}" doğru mu çalındı, bozuk mu?`,
+      aciklama: "Bildiğiniz bir ezgi çalınacak. Bazılarında yanlış bir nota var.",
+      secenekler: [
+        { deger: "dogru", etiket: "Doğru" },
+        { deger: "bozuk", etiket: "Bozuk" },
+        { deger: "duymadim", etiket: "Bu ezgiyi hiç duymadım" },
+      ],
+      dogru: bozuk ? "bozuk" : "dogru",
+      bilinen: e,
+      cal: () => ezgiCal(notalar, ctx!.currentTime + 0.1, 0, 60 / e.bpm),
+    };
+  }
+  function bolum3(): Soru[] {
+    const havuz = karistir(bilinenEzgiler as Bilinen[]);
+    if (havuz.length < 4) return [];
+    const bozuklar = karistir([true, true, false, false]);
+    bilinenKalan = havuz.slice(4);
+    return havuz.slice(0, 4).map((e, i) => bilinenSoru(e, bozuklar[i]));
+  }
+
+  // ---------- Akış ----------
+  let sorular: Soru[] = [];
+  let sira = 0;
+  const cevaplar: { bolum: number; dogru: boolean | null }[] = [];
+  let calmaBitis = 0;
+
+  function ekran(ad: string) {
+    document.querySelectorAll<HTMLElement>("[data-screen]").forEach((el) => (el.hidden = el.dataset.screen !== ad));
+    window.scrollTo({ top: 0 });
+  }
+  let etiketZamanlayicilar: number[] = [];
+  function etiketGoster(metin: string, gecikme: number) {
+    etiketZamanlayicilar.push(window.setTimeout(() => ($("[data-q-calan]").textContent = metin), gecikme * 1000));
+  }
+  function cal() {
+    sustur();
+    etiketZamanlayicilar.forEach(clearTimeout);
+    etiketZamanlayicilar = [];
+    $("[data-q-calan]").textContent = "Çalıyor";
+    const sure = sorular[sira].cal();
+    calmaBitis = performance.now() + sure * 1000;
+    const butonlar = document.querySelectorAll<HTMLButtonElement>("[data-q-cevaplar] button");
+    butonlar.forEach((b) => (b.disabled = true));
+    etiketZamanlayicilar.push(window.setTimeout(() => {
+      $("[data-q-calan]").textContent = "";
+      butonlar.forEach((b) => (b.disabled = false));
+    }, sure * 1000 + 200));
+  }
+  function soruGoster() {
+    const s = sorular[sira];
+    const bolumSorulari = sorular.filter((x) => x.bolum === s.bolum);
+    const bolumSirasi = bolumSorulari.indexOf(s) + 1;
+    $("[data-q-bolum]").textContent = BOLUM_ADI[s.bolum];
+    $("[data-q-sayac]").textContent = `${bolumSirasi} / ${bolumSorulari.length}`;
+    $("[data-q-baslik]").textContent = s.baslik;
+    $("[data-q-aciklama]").textContent = s.aciklama;
+    const kutu = $("[data-q-cevaplar]");
+    kutu.innerHTML = "";
+    s.secenekler.forEach((o) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = o.deger === "duymadim" ? "kt-answer kt-answer-minor" : "kt-answer";
+      b.textContent = o.etiket;
+      b.addEventListener("click", () => cevapla(o.deger));
+      kutu.appendChild(b);
+    });
+    ekran("soru");
+    cal();
+  }
+  function cevapla(deger: string) {
+    const s = sorular[sira];
+    sustur();
+    if (s.bolum === 3 && deger === "duymadim") {
+      // Puana sayılmaz; havuzdan başka bir ezgi aynı rolle gelir.
+      cevaplar.push({ bolum: 3, dogru: null });
+      const yeni = bilinenKalan.shift();
+      if (yeni) {
+        sorular[sira] = bilinenSoru(yeni, s.dogru === "bozuk");
+        soruGoster();
+        return;
+      }
+    } else {
+      cevaplar.push({ bolum: s.bolum, dogru: deger === s.dogru });
+    }
+    sira++;
+    if (sira < sorular.length) soruGoster();
+    else sonuc();
+  }
+
+  function sonuc() {
+    const puan = (b: number) => {
+      const c = cevaplar.filter((x) => x.bolum === b && x.dogru !== null);
+      return { dogru: c.filter((x) => x.dogru).length, toplam: c.length };
+    };
+    const p1 = puan(1), p2 = puan(2), p3 = puan(3);
+    const yarimSes = cevaplar.filter((x) => x.bolum === 1)[3]?.dogru === true; // 4. soru: yarım ses
+    const iyi = p1.dogru >= 3 && p2.dogru >= 3 && (p3.toplam === 0 || p3.dogru >= p3.toplam - 1);
+
+    $("[data-r-baslik]").textContent = iyi ? "Kulağınız büyük ihtimalle yerinde." : "Bu kısa test kesin bir şey söylemez.";
+    $("[data-r-metin]").textContent = iyi
+      ? (yarimSes
+          ? "Müzikteki en küçük adımı, yarım sesi de duydunuz. Gerçek doğuştan kulaksızlarda en çok zorlanılan fark bu."
+          : "Ezgileri ayırt ettiniz. Yarım ses sorusunda zorlandıysanız tekrar deneyin: en küçük adım, dikkat de ister.")
+      : "Telefon hoparlörü, ortam gürültüsü, dikkat ya da alışkanlık sonucu değiştirebilir. Kulaklıkla, sessiz bir yerde tekrar deneyin. Merak ediyorsanız aşağıdaki bilimsel test daha güvenilir.";
+
+    const satirlar: [string, { dogru: number; toplam: number }][] = [["Ses yönü", p1], ["Ezgi", p2]];
+    if (p3.toplam > 0) satirlar.push(["Bilinen ezgi", p3]);
+    $("[data-r-puanlar]").innerHTML = satirlar
+      .map(([ad, p]) => `<div><dt>${ad}</dt><dd class="mono">${p.dogru} / ${p.toplam}</dd></div>`)
+      .join("");
+    ($("[data-r-resmi]") as HTMLElement).hidden = iyi;
+    ekran("sonuc");
+  }
+
+  async function baslat() {
+    sorular = [...bolum1(), ...bolum2(), ...bolum3()];
+    sira = 0;
+    cevaplar.length = 0;
+    soruGoster();
+  }
+
+  // ---------- Düğmeler ----------
+  document.addEventListener("click", async (e) => {
+    const a = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
+    if (!a) return;
+    const durum = $("[data-status]") as HTMLElement;
+    switch (a.dataset.action) {
+      case "ses-kontrol":
+        durum.hidden = false;
+        durum.textContent = "Piyano yükleniyor";
+        try {
+          await sesHazirla();
+        } catch {
+          durum.textContent = "Ses yüklenemedi. Sayfayı yenileyip tekrar deneyin.";
+          return;
+        }
+        durum.hidden = true;
+        ekran("kontrol");
+        nota(60, ctx!.currentTime + 0.1, 1.5);
+        break;
+      case "kontrol-tekrar":
+        nota(60, ctx!.currentTime + 0.1, 1.5);
+        break;
+      case "basla":
+        baslat();
+        break;
+      case "tekrar-dinle":
+        if (performance.now() >= calmaBitis) cal();
+        break;
+      case "yeniden":
+        baslat();
+        break;
+    }
+  });
+</script>
+
+<style>
+  .kt-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-block: 18px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .kt-brand {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .kt {
+    max-width: 640px;
+    padding-block: clamp(32px, 6vw, 72px);
+  }
+  .kt-screen > * + * {
+    margin-top: 20px;
+  }
+  .kt h1 {
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+  }
+  .kt h2 {
+    font-size: clamp(22px, 3.6vw, 28px);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
+  .kt-lead {
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .kt-list {
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+  .kt-list li {
+    display: flex;
+    gap: 14px;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .kt-note {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .kt-note a,
+  .kt-next a:not(.cta) {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .kt-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+  }
+  .kt-link {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--fg);
+    font: inherit;
+    font-size: 14px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .kt-playing {
+    min-height: 1.5em;
+  }
+  .kt-answers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    border-top: 1px solid var(--rule);
+    border-left: 1px solid var(--rule);
+  }
+  .kt-answers :global(.kt-answer) {
+    min-height: 64px;
+    padding: 16px;
+    background: var(--bg);
+    color: var(--fg);
+    border: 0;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    font: inherit;
+    font-size: 17px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.14s ease, color 0.14s ease;
+  }
+  .kt-answers :global(.kt-answer:hover:not(:disabled)) {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .kt-answers :global(.kt-answer:disabled) {
+    color: var(--muted);
+    cursor: default;
+  }
+  .kt-answers :global(.kt-answer-minor) {
+    grid-column: 1 / -1;
+    min-height: 48px;
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .kt-scores {
+    border-top: 1px solid var(--rule);
+  }
+  .kt-scores :global(div) {
+    display: flex;
+    justify-content: space-between;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .kt-scores :global(dd) {
+    margin: 0;
+  }
+  .kt-facts {
+    padding-top: 8px;
+  }
+  .kt-facts p + p {
+    margin-top: 14px;
+  }
+  .kt-facts .mono {
+    display: block;
+    margin-top: 4px;
+  }
+  .kt-next {
+    border-top: 1px solid var(--rule);
+    padding-top: 20px;
+  }
+  .kt-next > * + * {
+    margin-top: 14px;
+  }
+</style>
