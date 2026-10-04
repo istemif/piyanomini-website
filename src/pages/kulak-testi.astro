@@ -65,6 +65,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
       <h2 data-q-baslik></h2>
       <p class="kt-lead" data-q-aciklama></p>
       <p class="mono muted kt-playing" data-q-calan aria-live="polite"></p>
+      <p class="kt-note" data-q-not hidden>Ses kesildiyse "Tekrar dinle"ye basın.</p>
       <div class="kt-answers" data-q-cevaplar></div>
       <div class="kt-actions">
         <button class="kt-link" type="button" data-action="tekrar-dinle">Tekrar dinle</button>
@@ -160,6 +161,19 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     src.start(when);
     src.stop(when + dur + RELEASE + 0.1);
     live.push(src);
+  }
+
+  // iOS Safari, sayfa arka plana geçince AudioContext'i "interrupted" durumuna alır ve
+  // geri dönünce kendiliğinden açmaz. Her çalmadan önce (hep bir dokunuşun içinde) uyandır;
+  // açılmazsa yeni bağlam kur. AudioBuffer'lar bağlamdan bağımsız, yeniden indirilmez.
+  async function sesiUyandir() {
+    if (!ctx || ctx.state === "running") return;
+    try { await ctx.resume(); } catch { /* aşağıda yeni bağlam */ }
+    if (ctx.state !== "running") {
+      try { await ctx.close(); } catch { /* zaten kapalı */ }
+      ctx = new AudioContext();
+      try { await ctx.resume(); } catch { /* bir sonraki dokunuşta tekrar */ }
+    }
   }
 
   function sustur() {
@@ -318,8 +332,10 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
   function etiketGoster(metin: string, gecikme: number) {
     etiketZamanlayicilar.push(window.setTimeout(() => ($("[data-q-calan]").textContent = metin), gecikme * 1000));
   }
-  function cal() {
+  async function cal() {
     sustur();
+    await sesiUyandir();
+    $("[data-q-not]").hidden = true;
     etiketZamanlayicilar.forEach(clearTimeout);
     etiketZamanlayicilar = [];
     $("[data-q-calan]").textContent = "Çalıyor";
@@ -407,6 +423,15 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     soruGoster();
   }
 
+  // Arka plana geçince sustur; dönünce ses kesilmiş olabilir, kullanıcıya söyle.
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { sustur(); return; }
+    if (ctx && ctx.state !== "running") {
+      const not = document.querySelector<HTMLElement>("[data-q-not]");
+      if (not && !(document.querySelector('[data-screen="soru"]') as HTMLElement).hidden) not.hidden = false;
+    }
+  });
+
   // ---------- Düğmeler ----------
   document.addEventListener("click", async (e) => {
     const a = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
@@ -427,6 +452,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
         nota(60, ctx!.currentTime + 0.1, 1.5);
         break;
       case "kontrol-tekrar":
+        await sesiUyandir();
         nota(60, ctx!.currentTime + 0.1, 1.5);
         break;
       case "basla":
