@@ -7,8 +7,8 @@ const appStore = new URL(APP_STORE_URL);
 appStore.searchParams.set("ct", "kulak-testi");
 appStore.searchParams.set("mt", "8");
 
-const ucuncuBolum = bilinenEzgiler.length >= 4;
-const bolumSayisi = ucuncuBolum ? "üç" : "iki";
+const bilinenVar = bilinenEzgiler.length >= 4;
+const bolumSayisi = bilinenVar ? "dört" : "üç";
 ---
 
 <Base
@@ -29,12 +29,13 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
       <h1>Müzik kulağınız gerçekten yok mu?</h1>
       <p class="kt-lead">
         "Müzik kulağım yok" diyenlerin çoğu, ölçüldüğünde normal çıkıyor. Bu kısa testte {bolumSayisi} bölüm var ve
-        yaklaşık üç dakika sürüyor. Sesler Piyanomini · Ars'ın piyanosuyla çalınır, ezgiler Ars'ın ezgi üreticisinden gelir.
+        yaklaşık dört dakika sürüyor. Sesler Piyanomini · Ars'ın piyanosuyla çalınır, ezgiler Ars'ın ezgi üreticisinden gelir.
       </p>
       <ul class="kt-list">
         <li><span class="mono">01</span> Kalın ve ince: ikinci nota daha kalın mı, daha ince mi, aynı mı?</li>
         <li><span class="mono">02</span> Ezgi: iki ezgi aynı mı, farklı mı?</li>
-        {ucuncuBolum && <li><span class="mono">03</span> Bilinen ezgi: yanlış bir nota var mı?</li>}
+        <li><span class="mono">03</span> Ritim: bütün notalar zamanında mı geldi?</li>
+        {bilinenVar && <li><span class="mono">04</span> Bilinen ezgi: yanlış bir nota var mı?</li>}
       </ul>
       <p class="kt-note">
         <strong>Bu bir teşhis testi değildir.</strong> Fikir verir. Kulaklıkla, sessiz bir yerde çözün. iPhone'da sessiz
@@ -198,7 +199,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
   type Ezgi = { id: string; mod: string; tonik: number; n: [number, number][] };
   type Bilinen = { id: string; ad: string; mod: "major" | "minor"; tonik: number; bpm: number; n: [number, number][] };
   type Soru = {
-    bolum: 1 | 2 | 3;
+    bolum: 1 | 2 | 3 | 4;
     baslik: string;
     aciklama: string;
     secenekler: { deger: string; etiket: string }[];
@@ -207,7 +208,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     bilinen?: Bilinen;
   };
 
-  const BOLUM_ADI: Record<number, string> = { 1: "Bölüm 1 · Kalın ve ince", 2: "Bölüm 2 · Ezgi", 3: "Bölüm 3 · Bilinen ezgi" };
+  const BOLUM_ADI: Record<number, string> = { 1: "Bölüm 1 · Kalın ve ince", 2: "Bölüm 2 · Ezgi", 3: "Bölüm 3 · Ritim", 4: "Bölüm 4 · Bilinen ezgi" };
 
   // ---------- Bölüm 1: ses yönü (Ars PitchDirection, Do3-Do5) ----------
   function bolum1(): Soru[] {
@@ -238,6 +239,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
   }
 
   // ---------- Bölüm 2: Ars ezgileri, aynı mı farklı mı (3 majör + 1 minör) ----------
+  const kullanilan = new Set<string>(); // ezgi bölüm 2 ve 3 arasında tekrar etmez
   const imza = (e: Ezgi) => e.n.map((x) => x[0]).join(",");
   function ezgiCal(notalar: [number, number][], t0: number, kaydir: number, vurusSn: number) {
     let t = t0;
@@ -251,7 +253,6 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     const havuz = arsEzgiler as Ezgi[];
     const modlar = karistir(["major", "major", "major", "minor"]);
     const ayniMi = karistir([true, true, false, false]);
-    const kullanilan = new Set<string>();
     const sec = (mod: string, haric?: Ezgi) => {
       const aday = havuz.filter((e) => e.mod === mod && !kullanilan.has(e.id) && (!haric || imza(e) !== imza(haric)));
       const e = aday[rnd(aday.length)];
@@ -298,11 +299,51 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
     n[i][0] += adaylar[rnd(adaylar.length)]; // tona ait olmayan "saçma" nota
     return n;
   }
+  // ---------- Bölüm 3: ritim, geç gelen nota (Peretz'in çevrimiçi testindeki "Off-beat" mantığı) ----------
+  // Ars havuzundan bir ezgi; 4 sorudan 2'sinde bir nota GECIKME vuruş geç başlar, bitişi yerinde kalır
+  // (sonraki notalar kaymaz). Ayar için: ?gecikme=0.3 (vuruş cinsinden).
+  const GECIKME = Number(new URLSearchParams(location.search).get("gecikme")) || 0.25;
+  function ritimCal(e: Ezgi, t0: number, kaydir: number, vurusSn: number, gecIndeks: number) {
+    let t = t0;
+    e.n.forEach(([midi, vurus], i) => {
+      const kay = i === gecIndeks ? GECIKME * vurusSn : 0;
+      if (midi > 0) nota(midi + kaydir, t + kay, vurus * vurusSn * 0.95 - kay);
+      t += vurus * vurusSn;
+    });
+    return t - t0;
+  }
+  function bolum3(): Soru[] {
+    const havuz = arsEzgiler as Ezgi[];
+    const gecMi = karistir([true, true, false, false]);
+    return gecMi.map((gec) => {
+      // geciktirilecek nota: ilk iki ve son değil, gecikmeden uzun (en az yarım vuruş)
+      const uygunlar = (e: Ezgi) => e.n.map((x, i) => i).filter((i) => i > 1 && i < e.n.length - 1 && e.n[i][0] > 0 && e.n[i][1] >= 0.5);
+      const aday = havuz.filter((e) => !kullanilan.has(e.id) && uygunlar(e).length > 0);
+      const e = aday[rnd(aday.length)];
+      kullanilan.add(e.id);
+      const uygun = uygunlar(e);
+      const gecIndeks = gec ? uygun[rnd(uygun.length)] : -1;
+      const kaydir = rnd(10) - 5;
+      return {
+        bolum: 3,
+        baslik: "Bütün notalar zamanında mı geldi?",
+        aciklama: "Bir ezgi çalınacak. Bazılarında bir nota biraz geç geliyor.",
+        secenekler: [
+          { deger: "zamaninda", etiket: "Hepsi zamanında" },
+          { deger: "gec", etiket: "Bir nota geç geldi" },
+        ],
+        dogru: gec ? "gec" : "zamaninda",
+        cal: () => ritimCal(e, ctx!.currentTime + 0.1, kaydir, 60 / 80, gecIndeks),
+      };
+    });
+  }
+
+  // ---------- Bölüm 4: bilinen ezgiler ----------
   let bilinenKalan: Bilinen[] = [];
   function bilinenSoru(e: Bilinen, bozuk: boolean): Soru {
     const notalar = bozuk ? boz(e) : e.n;
     return {
-      bolum: 3,
+      bolum: 4,
       baslik: `"${e.ad}" ezgisinde yanlış bir nota var mı?`,
       aciklama: "Ritmi hatırladığınızdan farklı olabilir, ona bakmayın. Yalnızca notalara dikkat edin.",
       secenekler: [
@@ -315,7 +356,7 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
       cal: () => ezgiCal(notalar, ctx!.currentTime + 0.1, 0, 60 / e.bpm),
     };
   }
-  function bolum3(): Soru[] {
+  function bolum4(): Soru[] {
     const havuz = karistir(bilinenEzgiler as Bilinen[]);
     if (havuz.length < 4) return [];
     const bozuklar = karistir([true, true, false, false]);
@@ -396,9 +437,9 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
   function cevapla(deger: string) {
     const s = sorular[sira];
     durdur();
-    if (s.bolum === 3 && deger === "duymadim") {
+    if (s.bolum === 4 && deger === "duymadim") {
       // Puana sayılmaz; havuzdan başka bir ezgi aynı rolle gelir.
-      cevaplar.push({ bolum: 3, dogru: null });
+      cevaplar.push({ bolum: 4, dogru: null });
       const yeni = bilinenKalan.shift();
       if (yeni) {
         sorular[sira] = bilinenSoru(yeni, s.dogru === "bozuk");
@@ -418,20 +459,21 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
       const c = cevaplar.filter((x) => x.bolum === b && x.dogru !== null);
       return { dogru: c.filter((x) => x.dogru).length, toplam: c.length };
     };
-    const p1 = puan(1), p2 = puan(2), p3 = puan(3);
+    const p1 = puan(1), p2 = puan(2), p3 = puan(3), p4 = puan(4);
     const yarimSes = cevaplar.filter((x) => x.bolum === 1)[3]?.dogru === true; // 4. soru: yarım ses
-    const iyi = p1.dogru >= 3 && p2.dogru >= 3 && (p3.toplam === 0 || p3.dogru >= p3.toplam - 1);
+    const iyi = p1.dogru >= 3 && p2.dogru >= 3 && p3.dogru >= 3 && (p4.toplam === 0 || p4.dogru >= p4.toplam - 1);
 
     $("[data-r-baslik]").textContent = iyi ? "Kulağınız büyük ihtimalle yerinde." : "Bu kısa test kesin bir şey söylemez.";
     $("[data-r-metin]").textContent = iyi
       ? (yarimSes
-          ? "Müzikteki en küçük adımı, yarım sesi de duydunuz. Doğuştan müzik kulağı olmayanların en çok zorlandığı fark bu."
+          ? "Müzikteki en küçük adımı, yarım sesi de duydunuz. Doğuştan müzik kulağı olmayanların çoğu zaman duyamadığı fark bu."
           : "Ezgileri ayırt ettiniz. Yarım ses sorusunda zorlandıysanız tekrar deneyin: en küçük adım, dikkat de ister.")
       : "Telefon hoparlörü, ortam gürültüsü, dikkat ya da alışkanlık sonucu değiştirebilir. Kulaklıkla, sessiz bir yerde tekrar deneyin. Merak ediyorsanız aşağıdaki bilimsel test daha güvenilir.";
 
-    const satirlar: [string, { dogru: number; toplam: number }][] = [["Kalın ve ince", p1], ["Ezgi", p2]];
-    if (p3.toplam > 0) satirlar.push(["Bilinen ezgi", p3]);
+    const satirlar: [string, { dogru: number; toplam: number }][] = [["Kalın ve ince", p1], ["Ezgi", p2], ["Ritim", p3]];
+    if (p4.toplam > 0) satirlar.push(["Bilinen ezgi", p4]);
     $("[data-r-puanlar]").innerHTML = satirlar
+      .filter(([, p]) => p.toplam > 0)
       .map(([ad, p]) => `<div><dt>${ad}</dt><dd class="mono">${p.dogru} / ${p.toplam}</dd></div>`)
       .join("");
     ($("[data-r-resmi]") as HTMLElement).hidden = iyi;
@@ -439,7 +481,10 @@ const bolumSayisi = ucuncuBolum ? "üç" : "iki";
   }
 
   async function baslat() {
-    sorular = [...bolum1(), ...bolum2(), ...bolum3()];
+    kullanilan.clear();
+    // Ayar için: ?bolum=ritim yalnız ritim bölümünü açar
+    const yalniz = new URLSearchParams(location.search).get("bolum");
+    sorular = yalniz === "ritim" ? bolum3() : [...bolum1(), ...bolum2(), ...bolum3(), ...bolum4()];
     sira = 0;
     cevaplar.length = 0;
     soruGoster();
