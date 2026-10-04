@@ -210,13 +210,19 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
 
   const BOLUM_ADI: Record<number, string> = { 1: "Bölüm 1 · Kalın ve ince", 2: "Bölüm 2 · Ezgi", 3: "Bölüm 3 · Ritim", 4: "Bölüm 4 · Bilinen ezgi" };
 
-  // ---------- Bölüm 1: ses yönü (Ars PitchDirection, Do3-Do5) ----------
+  // ---------- Bölüm 1: kalın ve ince (Ars PitchDirection mantığı, Do3-Do5) ----------
+  // 5 soru, karışık sıra: bir "aynı", bir küçük ikili (yarım ses) ve 2-11 yarım ses
+  // (büyük ikiliden büyük yediliye) arasından üç farklı aralık. Notalar Do3-Do5 (48-72).
+  let yarimSesSira = -1;
   function bolum1(): Soru[] {
-    const boyut = [5, 4, 3, 2, 1];
-    const aynıYeri = rnd(4); // tam bir "aynı", ilk dört sorudan birinde; son soru hep yarım ses
-    return boyut.map((b, i) => {
-      const yon = i === aynıYeri ? "ayni" : Math.random() < 0.5 ? "yukari" : "asagi";
-      const ilk = 52 + rnd(17); // 52-68: ±5 ile 48-72 içinde kalır
+    const digerleri = karistir([2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).slice(0, 3);
+    const plan = karistir<number>([0, 1, ...digerleri]); // 0 = aynı
+    yarimSesSira = plan.indexOf(1);
+    return plan.map((b) => {
+      const yon = b === 0 ? "ayni" : Math.random() < 0.5 ? "yukari" : "asagi";
+      const alt = yon === "asagi" ? 48 + b : 48;
+      const ust = yon === "yukari" ? 72 - b : 72;
+      const ilk = alt + rnd(ust - alt + 1);
       const ikinci = yon === "ayni" ? ilk : yon === "yukari" ? ilk + b : ilk - b;
       return {
         bolum: 1,
@@ -460,7 +466,7 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
       return { dogru: c.filter((x) => x.dogru).length, toplam: c.length };
     };
     const p1 = puan(1), p2 = puan(2), p3 = puan(3), p4 = puan(4);
-    const yarimSes = cevaplar.filter((x) => x.bolum === 1)[4]?.dogru === true; // 5. soru: yarım ses
+    const yarimSes = cevaplar.filter((x) => x.bolum === 1)[yarimSesSira]?.dogru === true; // küçük ikili sorusu
     // Eşik 4/5: 2 seçenekli bölümde rastgele basan %19, 3 seçeneklide %4,5 ihtimalle ulaşır; 3/5 = %50 (anlamsız)
     const iyi = p1.dogru >= 4 && p2.dogru >= 4 && p3.dogru >= 4 && (p4.toplam === 0 || p4.dogru >= p4.toplam - 1);
 
