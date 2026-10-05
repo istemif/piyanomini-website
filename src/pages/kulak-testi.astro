@@ -259,21 +259,24 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
     const havuz = arsEzgiler as Ezgi[];
     const modlar = karistir(["major", "major", "major", "major", "minor"]);
     const ayniMi = karistir([true, true, false, false, Math.random() < 0.5]);
-    const sec = (mod: string, haric?: Ezgi) => {
-      const aday = havuz.filter((e) => e.mod === mod && !kullanilan.has(e.id) && (!haric || imza(e) !== imza(haric)));
+    // "Farklı" çiftte ritim aynı, yalnız perdeler değişir: perdeyi duyamayan ritimden ayırt edemez (MBEA'daki gibi)
+    const ritim = (e: Ezgi) => e.n.map((x) => x[1]).join(",");
+    const bos = (e: Ezgi, mod: string) => e.mod === mod && !kullanilan.has(e.id);
+    const esler = (a: Ezgi) => havuz.filter((e) => bos(e, a.mod) && ritim(e) === ritim(a) && imza(e) !== imza(a));
+    const al = (aday: Ezgi[]) => {
       const e = aday[rnd(aday.length)];
       kullanilan.add(e.id);
       return e;
     };
     return modlar.map((mod, i) => {
-      const a = sec(mod);
-      const b = ayniMi[i] ? a : sec(mod, a);
+      const a = al(havuz.filter((e) => bos(e, mod) && (ayniMi[i] || esler(e).length > 0)));
+      const b = ayniMi[i] ? a : al(esler(a));
       const kaydir = rnd(10) - 5; // iki ezgi aynı tona taşınır (-5..+4 yarım ses)
       const vurusSn = 60 / 80; // Ars melodi diktesi: tempo 80
       return {
         bolum: 2,
         baslik: "İki ezgi aynı mı, farklı mı?",
-        aciklama: "Aynı tonda, aynı uzunlukta iki ezgi art arda çalınacak.",
+        aciklama: "Aynı tonda, aynı ritimde iki ezgi art arda çalınacak.",
         secenekler: [
           { deger: "ayni", etiket: "Aynı" },
           { deger: "farkli", etiket: "Farklı" },
