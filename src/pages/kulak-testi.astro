@@ -8,13 +8,13 @@ appStore.searchParams.set("ct", "kulak-testi");
 appStore.searchParams.set("mt", "8");
 
 const bilinenVar = bilinenEzgiler.length >= 5;
-const bolumSayisi = bilinenVar ? "dört" : "üç";
+const bolumSayisi = bilinenVar ? "beş" : "dört";
 ---
 
 <Base
   lang="tr"
   title="Kulak testi · Piyanomini"
-  description="Birkaç dakikalık ücretsiz kulak testi: kalın ve ince sesi, ezgileri ayırt etme. Piyanomini · Ars'ın ses ve ezgi üreticisiyle."
+  description="Birkaç dakikalık ücretsiz kulak testi: kalın ve ince sesi, ezgileri ve ritimleri ayırt etme. Piyanomini · Ars'ın sesleri, ezgi ve ritim üreticileriyle."
   canonicalPath="/kulak-testi"
 >
   <header class="kt-bar wrap">
@@ -29,13 +29,15 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
       <h1>Müzik kulağınız gerçekten yok mu?</h1>
       <p class="kt-lead">
         "Müzik kulağım yok" diyenlerin çoğu, ölçüldüğünde normal çıkıyor. Bu kısa testte {bolumSayisi} bölüm var ve
-        yaklaşık beş dakika sürüyor. Sesler Piyanomini · Ars'ın piyanosuyla çalınır, ezgiler Ars'ın ezgi üreticisinden gelir.
+        yaklaşık altı dakika sürüyor. Sesler Piyanomini · Ars'ın piyano ve alkış sesleriyle çalınır, ezgiler ve ritimler
+        Ars'ın üreticilerinden gelir.
       </p>
       <ul class="kt-list">
         <li><span class="mono">01</span> Kalın ve ince: ikinci nota daha kalın mı, daha ince mi, aynı mı?</li>
         <li><span class="mono">02</span> Ezgi: iki ezgi aynı mı, farklı mı?</li>
         <li><span class="mono">03</span> Ritim: bütün notalar zamanında mı geldi?</li>
-        {bilinenVar && <li><span class="mono">04</span> Bilinen ezgi: yanlış bir nota var mı?</li>}
+        <li><span class="mono">04</span> Alkış ritmi: iki ritim aynı mı, farklı mı?</li>
+        {bilinenVar && <li><span class="mono">05</span> Bilinen ezgi: yanlış bir nota var mı?</li>}
       </ul>
       <p class="kt-note">
         <strong>Bu bir teşhis testi değildir.</strong> Fikir verir. Kulaklıkla, sessiz bir yerde çözün. iPhone'da sessiz
@@ -142,15 +144,53 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
       ctx = new AudioContext();
     }
     if (ctx.state === "suspended") await ctx.resume();
-    if (buffers.size === ROOTS.length) return;
-    await Promise.all(
-      ROOTS.map(async (root) => {
+    if (buffers.size === ROOTS.length && alkisBuf.length === ALKIS_SAYISI) return;
+    await Promise.all([
+      ...ROOTS.map(async (root) => {
         const res = await fetch(`/kulak-testi/piano/${ZONES[root]}.m4a`);
         const buf = await ctx!.decodeAudioData(await res.arrayBuffer());
         buffers.set(root, buf);
       }),
-    );
+      // WAV: AAC kodlayıcının baştaki gecikmesi alkışı tıka göre geç duyururdu
+      ...Array.from({ length: ALKIS_SAYISI }, async (_, i) => {
+        const res = await fetch(`/kulak-testi/perkusyon/clap_${i + 1}.wav`);
+        alkisBuf[i] = await ctx!.decodeAudioData(await res.arrayBuffer());
+      }),
+    ]);
   }
+
+  // ---------- Alkış ve metronom tıkı (Ars: RhythmSound.clap, AudioManager.makeClickBuffer) ----------
+  // Alkış: FreePats World Percussion, clap_1-4 (CC0), Ars'taki gibi sırayla döner. Her ölçüde
+  // sıra baştan başlar: "aynı" iki ritim birebir aynı örneklerle çalınır.
+  const ALKIS_SAYISI = 4;
+  const alkisBuf: AudioBuffer[] = [];
+  const KLIK_SEVIYE = 0.5; // tık alkışın arkasında kalsın
+  let klikBuf: { yuksek: AudioBuffer; alcak: AudioBuffer } | null = null;
+  function klikYap(c: AudioContext, yuksek: boolean) {
+    // Ars ile aynı: 15 ms sinüs darbesi, 1200 Hz (ölçü başı 4 yarım ses tiz), karesel sönüm
+    const n = Math.floor(c.sampleRate * 0.015);
+    const b = c.createBuffer(1, n, c.sampleRate);
+    const d = b.getChannelData(0);
+    const f = yuksek ? 1200 * Math.pow(2, 4 / 12) : 1200;
+    for (let k = 0; k < n; k++) d[k] = Math.sin((2 * Math.PI * f * k) / c.sampleRate) * (1 - k / n) ** 2 * 0.9;
+    return b;
+  }
+  function tekAtis(buf: AudioBuffer, when: number, seviye: number) {
+    if (!ctx) return;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const g = ctx.createGain();
+    g.gain.value = seviye;
+    src.connect(g).connect(ctx.destination);
+    src.start(when);
+    live.push(src);
+  }
+  function klik(when: number, yuksek: boolean) {
+    if (!ctx) return;
+    klikBuf ??= { yuksek: klikYap(ctx, true), alcak: klikYap(ctx, false) };
+    tekAtis(yuksek ? klikBuf.yuksek : klikBuf.alcak, when, KLIK_SEVIYE);
+  }
+  const alkis = (when: number, sira: number) => tekAtis(alkisBuf[sira % ALKIS_SAYISI], when, 0.8);
 
   function nota(midi: number, when: number, dur: number) {
     if (!ctx) return;
@@ -199,7 +239,7 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
   type Ezgi = { id: string; mod: string; tonik: number; n: [number, number][] };
   type Bilinen = { id: string; ad: string; mod: "major" | "minor"; tonik: number; bpm: number; n: [number, number][] };
   type Soru = {
-    bolum: 1 | 2 | 3 | 4;
+    bolum: 1 | 2 | 3 | 4 | 5;
     baslik: string;
     aciklama: string;
     secenekler: { deger: string; etiket: string }[];
@@ -208,7 +248,9 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
     bilinen?: Bilinen;
   };
 
-  const BOLUM_ADI: Record<number, string> = { 1: "Bölüm 1 · Kalın ve ince", 2: "Bölüm 2 · Ezgi", 3: "Bölüm 3 · Ritim", 4: "Bölüm 4 · Bilinen ezgi" };
+  const BOLUM_ADI: Record<number, string> = {
+    1: "Bölüm 1 · Kalın ve ince", 2: "Bölüm 2 · Ezgi", 3: "Bölüm 3 · Ritim", 4: "Bölüm 4 · Alkış ritmi", 5: "Bölüm 5 · Bilinen ezgi",
+  };
 
   // ---------- Bölüm 1: kalın ve ince (Ars PitchDirection mantığı, Do3-Do5) ----------
   // 5 soru, karışık sıra: bir "aynı", bir küçük ikili (yarım ses) ve 2-11 yarım ses
@@ -295,7 +337,7 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
     });
   }
 
-  // ---------- Bölüm 3: bilinen ezgiler (10'luk havuzdan 4; 2 bozuk, 2 sağlam) ----------
+  // ---------- Bölüm 5: bilinen ezgiler (10'luk havuzdan 5; 2-3 bozuk) ----------
   const DIZI = { major: [0, 2, 4, 5, 7, 9, 11], minor: [0, 2, 3, 5, 7, 8, 10, 11] };
   function boz(e: Bilinen): [number, number][] {
     const n = e.n.map((x) => [x[0], x[1]] as [number, number]);
@@ -347,12 +389,76 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
     });
   }
 
-  // ---------- Bölüm 4: bilinen ezgiler ----------
+  // ---------- Bölüm 4: alkış ritmi, aynı mı farklı mı (MBEA'nın Rhythm testindeki biçim) ----------
+  // Ritimler Ars'ın ritim üreticisinden (NoteValue.swift, RhythmPattern.random: hazır hücreler,
+  // ağırlıklı torbadan iadesiz çekiliş). Ayarlar: 4/4, tek ölçü; ikilik, dörtlük, sekizlik; nokta
+  // açık; zor sekizlikler (senkop: ♪ + noktalı ♩) açık; bağ, onaltılık, üçleme yok. En uzun değer
+  // 2 vuruş: noktalı ikilik hücresi alınmadı. Sus kapalı: alkışta sus sessizlik olarak duyulur,
+  // 4 vuruşa varan boşluk ve tek alkışlı ölçü üretiyordu. Alkışta süre duyulmaz, yalnız vuruş
+  // anları: hücrede notaların hücre içindeki başlangıcı tutulur.
+  type Hucre = { v: number[]; s: number; w: number }; // v: vuruş anları, s: kaç vuruş, w: ağırlık
+  const HUCRELER: Hucre[] = [
+    { v: [0], s: 1, w: 4 }, // ♩
+    { v: [0, 0.5], s: 1, w: 3 }, // ♫
+    { v: [0], s: 2, w: 3 }, // ikilik
+    { v: [0, 1.5], s: 2, w: 2 }, // noktalı ♩ + ♪
+    { v: [0, 0.5], s: 2, w: 1 }, // ♪ + noktalı ♩ (senkop)
+  ];
+  function alkisOlcusu(): number[] {
+    const torbaKur = () => karistir(HUCRELER.flatMap((h) => Array<Hucre>(h.w).fill(h)));
+    let torba = torbaKur();
+    const v: number[] = [];
+    let t = 0;
+    while (t < 4) {
+      let uyan = torba.map((_, i) => i).filter((i) => torba[i].s <= 4 - t);
+      if (!uyan.length) {
+        torba = torbaKur();
+        uyan = torba.map((_, i) => i).filter((i) => torba[i].s <= 4 - t);
+      }
+      const h = torba.splice(uyan[rnd(uyan.length)], 1)[0];
+      h.v.forEach((x) => v.push(t + x));
+      t += h.s;
+    }
+    return v;
+  }
+  const ALKIS_TEMPO = 80; // Ars metronomunun varsayılanı
+  function bolum4(): Soru[] {
+    const ayniMi = karistir([true, true, false, false, Math.random() < 0.5]);
+    return ayniMi.map((ayni) => {
+      const a = alkisOlcusu();
+      let b = a;
+      // "Farklı": bağımsız ikinci ritim; vuruş anları birebir aynı çıkarsa yeniden üret
+      if (!ayni) do b = alkisOlcusu(); while (b.join() === a.join());
+      return {
+        bolum: 4,
+        baslik: "İki ritim aynı mı, farklı mı?",
+        aciklama: "Dört tıktan sonra iki ritim alkışla çalınacak. Tıklar vuruşu gösterir, hiç durmaz.",
+        secenekler: [
+          { deger: "ayni", etiket: "Aynı" },
+          { deger: "farkli", etiket: "Farklı" },
+        ],
+        dogru: ayni ? "ayni" : "farkli",
+        cal: () => {
+          // 1 ölçü sayma, 1. ritim, 1 ölçü yalnız tık, 2. ritim (Ars ritim diktesindeki eşlik tıkları gibi)
+          const t = ctx!.currentTime + 0.1;
+          const vs = 60 / ALKIS_TEMPO;
+          for (let k = 0; k < 16; k++) klik(t + k * vs, k % 4 === 0);
+          a.forEach((x, i) => alkis(t + (4 + x) * vs, i));
+          b.forEach((x, i) => alkis(t + (12 + x) * vs, i));
+          doldur(1, 0.1 + 4 * vs, 4 * vs);
+          doldur(2, 0.1 + 12 * vs, 4 * vs);
+          return 16 * vs;
+        },
+      };
+    });
+  }
+
+  // ---------- Bölüm 5: bilinen ezgiler ----------
   let bilinenKalan: Bilinen[] = [];
   function bilinenSoru(e: Bilinen, bozuk: boolean): Soru {
     const notalar = bozuk ? boz(e) : e.n;
     return {
-      bolum: 4,
+      bolum: 5,
       baslik: `"${e.ad}" ezgisinde yanlış bir nota var mı?`,
       aciklama: "Ritmi hatırladığınızdan farklı olabilir, ona bakmayın. Yalnızca notalara dikkat edin.",
       secenekler: [
@@ -365,7 +471,7 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
       cal: () => ezgiCal(notalar, ctx!.currentTime + 0.1, 0, 60 / e.bpm),
     };
   }
-  function bolum4(): Soru[] {
+  function bolum5(): Soru[] {
     const havuz = karistir(bilinenEzgiler as Bilinen[]);
     if (havuz.length < 5) return [];
     const bozuklar = karistir([true, true, false, false, Math.random() < 0.5]);
@@ -383,7 +489,13 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
     window.scrollTo({ top: 0 });
   }
   let etiketZamanlayicilar: number[] = [];
-  // Bölüm 2: her kutu kendi ezgisi boyunca soldan sağa dolar (ilerleme çubuğu)
+  // Bölüm 2 ve 4: her kutu kendi ezgisi/ritmi boyunca soldan sağa dolar (ilerleme çubuğu)
+  function gostergeEtiket(ad: string) {
+    ([1, 2] as const).forEach((h) => {
+      const el = document.querySelector<HTMLElement>(`[data-q-gosterge] [data-g="${h}"]`)!;
+      el.innerHTML = `<span class="kt-dolgu">${h}. ${ad}</span>${h}. ${ad}`;
+    });
+  }
   const dolgu = (hangi: 1 | 2) =>
     document.querySelector<HTMLElement>(`[data-q-gosterge] [data-g="${hangi}"] .kt-dolgu`)!;
   function gostergeSifirla() {
@@ -410,9 +522,11 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
     durdur();
     await sesiUyandir();
     $("[data-q-not]").hidden = true;
-    const ikiEzgi = sorular[sira].bolum === 2;
-    ($("[data-q-gosterge]") as HTMLElement).hidden = !ikiEzgi;
-    $("[data-q-calan]").textContent = ikiEzgi ? "" : "Çalıyor";
+    const bolum = sorular[sira].bolum;
+    const ikili = bolum === 2 || bolum === 4;
+    ($("[data-q-gosterge]") as HTMLElement).hidden = !ikili;
+    if (ikili) gostergeEtiket(bolum === 2 ? "ezgi" : "ritim");
+    $("[data-q-calan]").textContent = bolum === 2 ? "" : "Çalıyor"; // bölüm 4: sayma tıkları sırasında da
     gostergeSifirla();
     void dolgu(1).offsetWidth; // sıfırlamanın geçişsiz uygulanması için
     const sure = sorular[sira].cal();
@@ -446,9 +560,9 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
   function cevapla(deger: string) {
     const s = sorular[sira];
     durdur();
-    if (s.bolum === 4 && deger === "duymadim") {
+    if (s.bolum === 5 && deger === "duymadim") {
       // Puana sayılmaz; havuzdan başka bir ezgi aynı rolle gelir.
-      cevaplar.push({ bolum: 4, dogru: null });
+      cevaplar.push({ bolum: 5, dogru: null });
       const yeni = bilinenKalan.shift();
       if (yeni) {
         sorular[sira] = bilinenSoru(yeni, s.dogru === "bozuk");
@@ -468,10 +582,10 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
       const c = cevaplar.filter((x) => x.bolum === b && x.dogru !== null);
       return { dogru: c.filter((x) => x.dogru).length, toplam: c.length };
     };
-    const p1 = puan(1), p2 = puan(2), p3 = puan(3), p4 = puan(4);
+    const p1 = puan(1), p2 = puan(2), p3 = puan(3), p4 = puan(4), p5 = puan(5);
     const yarimSes = cevaplar.filter((x) => x.bolum === 1)[yarimSesSira]?.dogru === true; // küçük ikili sorusu
     // Eşik 4/5: 2 seçenekli bölümde rastgele basan %19, 3 seçeneklide %4,5 ihtimalle ulaşır; 3/5 = %50 (anlamsız)
-    const iyi = p1.dogru >= 4 && p2.dogru >= 4 && p3.dogru >= 4 && (p4.toplam === 0 || p4.dogru >= p4.toplam - 1);
+    const iyi = [p1, p2, p3, p4].every((p) => p.dogru >= 4) && (p5.toplam === 0 || p5.dogru >= p5.toplam - 1);
 
     $("[data-r-baslik]").textContent = iyi ? "Kulağınız büyük ihtimalle yerinde." : "Bu kısa test kesin bir şey söylemez.";
     $("[data-r-metin]").textContent = iyi
@@ -480,8 +594,10 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
           : "Ezgileri ayırt ettiniz. Yarım ses sorusunda zorlandıysanız tekrar deneyin: en küçük adım, dikkat de ister.")
       : "Telefon hoparlörü, ortam gürültüsü, dikkat ya da alışkanlık sonucu değiştirebilir. Kulaklıkla, sessiz bir yerde tekrar deneyin. Merak ediyorsanız aşağıdaki bilimsel test daha güvenilir.";
 
-    const satirlar: [string, { dogru: number; toplam: number }][] = [["Kalın ve ince", p1], ["Ezgi", p2], ["Ritim", p3]];
-    if (p4.toplam > 0) satirlar.push(["Bilinen ezgi", p4]);
+    const satirlar: [string, { dogru: number; toplam: number }][] = [
+      ["Kalın ve ince", p1], ["Ezgi", p2], ["Ritim", p3], ["Alkış ritmi", p4],
+    ];
+    if (p5.toplam > 0) satirlar.push(["Bilinen ezgi", p5]);
     $("[data-r-puanlar]").innerHTML = satirlar
       .filter(([, p]) => p.toplam > 0)
       .map(([ad, p]) => `<div><dt>${ad}</dt><dd class="mono">${p.dogru} / ${p.toplam}</dd></div>`)
@@ -492,9 +608,12 @@ const bolumSayisi = bilinenVar ? "dört" : "üç";
 
   async function baslat() {
     kullanilan.clear();
-    // Ayar için: ?bolum=ritim yalnız ritim bölümünü açar
+    // Ayar için: ?bolum=ritim ya da ?bolum=alkis yalnız o bölümü açar
     const yalniz = new URLSearchParams(location.search).get("bolum");
-    sorular = yalniz === "ritim" ? bolum3() : [...bolum1(), ...bolum2(), ...bolum3(), ...bolum4()];
+    sorular =
+      yalniz === "ritim" ? bolum3()
+      : yalniz === "alkis" ? bolum4()
+      : [...bolum1(), ...bolum2(), ...bolum3(), ...bolum4(), ...bolum5()];
     sira = 0;
     cevaplar.length = 0;
     soruGoster();
