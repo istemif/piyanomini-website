@@ -570,22 +570,33 @@ const bolumSayisi = bilinenVar ? "beş" : "dört";
     };
     const p1 = puan(1), p2 = puan(2), p3 = puan(3), p4 = puan(4), p5 = puan(5);
     const yarimSes = cevaplar.filter((x) => x.bolum === 1)[yarimSesSira]?.dogru === true; // küçük ikili sorusu
-    // Eşik 4/5: 2 seçenekli bölümde rastgele basan %19, 3 seçeneklide %4,5 ihtimalle ulaşır; 3/5 = %50 (anlamsız)
-    const iyi = [p1, p2, p3, p4].every((p) => p.dogru >= 4) && (p5.toplam === 0 || p5.dogru >= p5.toplam - 1);
+    const bolumler = ([
+      ["Kalın ve ince", p1], ["Ezgi", p2], ["Ritim", p3], ["Alkış ritmi", p4], ["Bilinen ezgi", p5],
+    ] as [string, { dogru: number; toplam: number }][]).filter(([, p]) => p.toplam > 0);
+    // Toplama göre (İstemi): 25'te 20 ve üstü mükemmel, 15-19 iyi. Olumsuz hüküm yok: yüksek sonuç bilgi
+    // verir, düşük sonuç vermez (telefon, gürültü, dikkat). Rastgele basan 20+'ya %0,1, 15-19'a %12,5
+    // olasılıkla ulaşır: "kulağınız yerinde" yalnız mükemmelde söylenir.
+    const toplam = bolumler.reduce((a, [, p]) => ({ dogru: a.dogru + p.dogru, toplam: a.toplam + p.toplam }), { dogru: 0, toplam: 0 });
+    const oran = toplam.dogru / toplam.toplam; // bilinen ezgi eksikse de 20/25 ve 15/25 oranı
+    const seviye = oran >= 0.8 ? "mukemmel" : oran >= 0.6 ? "iyi" : "tekrar";
+    const [enIyiAd, enIyi] = bolumler.reduce((a, b) => (b[1].dogru / b[1].toplam > a[1].dogru / a[1].toplam ? b : a));
+    const enIyiCumle = `En iyi bölümünüz: ${enIyiAd} (${enIyi.dogru} / ${enIyi.toplam}).`;
 
-    $("[data-r-baslik]").textContent = iyi ? "Kulağınız büyük ihtimalle yerinde." : "Bu kısa test kesin bir şey söylemez.";
-    $("[data-r-metin]").textContent = iyi
-      ? (yarimSes
-          ? "Müzikteki en küçük adımı, yarım sesi de duydunuz. Doğuştan müzik kulağı olmayanların çoğu zaman duyamadığı fark bu."
-          : "Ezgileri ayırt ettiniz. Yarım ses sorusunda zorlandıysanız tekrar deneyin: en küçük adım, dikkat de ister.")
-      : "Telefon hoparlörü, ortam gürültüsü, dikkat ya da alışkanlık sonucu değiştirebilir. Kulaklıkla, sessiz bir yerde tekrar deneyin. Merak ediyorsanız aşağıdaki bilimsel test daha güvenilir.";
+    $("[data-r-baslik]").textContent = {
+      mukemmel: "Mükemmel: kulağınız büyük ihtimalle yerinde.",
+      iyi: "İyi: farkların çoğunu duydunuz.",
+      tekrar: "Kulaklıkla bir kez daha deneyin.",
+    }[seviye];
+    $("[data-r-metin]").textContent = {
+      mukemmel: yarimSes
+        ? "Müzikteki en küçük adımı, yarım sesi de duydunuz. Doğuştan müzik kulağı olmayanların çoğu zaman duyamadığı fark bu."
+        : "Ezgileri ayırt ettiniz. Yarım ses sorusunda zorlandıysanız tekrar deneyin: en küçük adım, dikkat de ister.",
+      iyi: `${enIyiCumle} Kulaklıkla, sessiz bir yerde tekrar çözerseniz kalan farkları da yakalayabilirsiniz.`,
+      tekrar: `${enIyiCumle} Telefon hoparlörü, ortam gürültüsü ve dikkat, beş dakikalık bir testin sonucunu kolayca değiştirir.`,
+    }[seviye];
+    const iyi = seviye !== "tekrar"; // bilimsel test bağlantısı yalnız 15'in altında
 
-    const satirlar: [string, { dogru: number; toplam: number }][] = [
-      ["Kalın ve ince", p1], ["Ezgi", p2], ["Ritim", p3], ["Alkış ritmi", p4],
-    ];
-    if (p5.toplam > 0) satirlar.push(["Bilinen ezgi", p5]);
-    $("[data-r-puanlar]").innerHTML = satirlar
-      .filter(([, p]) => p.toplam > 0)
+    $("[data-r-puanlar]").innerHTML = [...bolumler, ["Toplam", toplam] as [string, typeof toplam]]
       .map(([ad, p]) => `<div><dt>${ad}</dt><dd class="mono">${p.dogru} / ${p.toplam}</dd></div>`)
       .join("");
     ($("[data-r-resmi]") as HTMLElement).hidden = iyi;
@@ -801,6 +812,9 @@ const bolumSayisi = bilinenVar ? "beş" : "dört";
   }
   .kt-scores :global(dd) {
     margin: 0;
+  }
+  .kt-scores :global(div:last-child) {
+    font-weight: 600;
   }
   .kt-facts {
     padding-top: 8px;
