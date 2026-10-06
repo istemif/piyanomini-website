@@ -159,38 +159,21 @@ const bolumSayisi = bilinenVar ? "beş" : "dört";
     ]);
   }
 
-  // ---------- Alkış ve metronom tıkı (Ars: RhythmSound.clap, AudioManager.makeClickBuffer) ----------
-  // Alkış: FreePats World Percussion, clap_1-4 (CC0), Ars'taki gibi sırayla döner. Her ölçüde
-  // sıra baştan başlar: "aynı" iki ritim birebir aynı örneklerle çalınır.
+  // ---------- Alkış (Ars: RhythmSound.clap) ----------
+  // FreePats World Percussion, clap_1-4 (CC0), Ars'taki gibi sırayla döner. Her ölçüde sıra baştan
+  // başlar: "aynı" iki ritim birebir aynı örneklerle çalınır.
   const ALKIS_SAYISI = 4;
   const alkisBuf: AudioBuffer[] = [];
-  const KLIK_SEVIYE = 0.5; // tık alkışın arkasında kalsın
-  let klikBuf: { yuksek: AudioBuffer; alcak: AudioBuffer } | null = null;
-  function klikYap(c: AudioContext, yuksek: boolean) {
-    // Ars ile aynı: 15 ms sinüs darbesi, 1200 Hz (ölçü başı 4 yarım ses tiz), karesel sönüm
-    const n = Math.floor(c.sampleRate * 0.015);
-    const b = c.createBuffer(1, n, c.sampleRate);
-    const d = b.getChannelData(0);
-    const f = yuksek ? 1200 * Math.pow(2, 4 / 12) : 1200;
-    for (let k = 0; k < n; k++) d[k] = Math.sin((2 * Math.PI * f * k) / c.sampleRate) * (1 - k / n) ** 2 * 0.9;
-    return b;
-  }
-  function tekAtis(buf: AudioBuffer, when: number, seviye: number) {
+  function alkis(when: number, sira: number) {
     if (!ctx) return;
     const src = ctx.createBufferSource();
-    src.buffer = buf;
+    src.buffer = alkisBuf[sira % ALKIS_SAYISI];
     const g = ctx.createGain();
-    g.gain.value = seviye;
+    g.gain.value = 0.8;
     src.connect(g).connect(ctx.destination);
     src.start(when);
     live.push(src);
   }
-  function klik(when: number, yuksek: boolean) {
-    if (!ctx) return;
-    klikBuf ??= { yuksek: klikYap(ctx, true), alcak: klikYap(ctx, false) };
-    tekAtis(yuksek ? klikBuf.yuksek : klikBuf.alcak, when, KLIK_SEVIYE);
-  }
-  const alkis = (when: number, sira: number) => tekAtis(alkisBuf[sira % ALKIS_SAYISI], when, 0.8);
 
   function nota(midi: number, when: number, dur: number) {
     if (!ctx) return;
@@ -432,22 +415,23 @@ const bolumSayisi = bilinenVar ? "beş" : "dört";
       return {
         bolum: 4,
         baslik: "İki ritim aynı mı, farklı mı?",
-        aciklama: "Dört tıktan sonra iki ritim alkışla çalınacak. Tıklar vuruşu gösterir, hiç durmaz.",
+        aciklama: "İki ritim alkışla art arda çalınacak.",
         secenekler: [
           { deger: "ayni", etiket: "Aynı" },
           { deger: "farkli", etiket: "Farklı" },
         ],
         dogru: ayni ? "ayni" : "farkli",
         cal: () => {
-          // 1 ölçü sayma, 1. ritim, 1 ölçü yalnız tık, 2. ritim (Ars ritim diktesindeki eşlik tıkları gibi)
+          // Metronom yok (İstemi): 1. ritim, kısa sessizlik, 2. ritim. Ritim hep ilk vuruşta başlar.
           const t = ctx!.currentTime + 0.1;
           const vs = 60 / ALKIS_TEMPO;
-          for (let k = 0; k < 16; k++) klik(t + k * vs, k % 4 === 0);
-          a.forEach((x, i) => alkis(t + (4 + x) * vs, i));
-          b.forEach((x, i) => alkis(t + (12 + x) * vs, i));
-          doldur(1, 0.1 + 4 * vs, 4 * vs);
-          doldur(2, 0.1 + 12 * vs, 4 * vs);
-          return 16 * vs;
+          const olcu = 4 * vs;
+          const ARA = 1.6; // ezgi bölümündeki gibi
+          a.forEach((x, i) => alkis(t + x * vs, i));
+          b.forEach((x, i) => alkis(t + olcu + ARA + x * vs, i));
+          doldur(1, 0.1, olcu);
+          doldur(2, 0.1 + olcu + ARA, olcu);
+          return 2 * olcu + ARA;
         },
       };
     });
@@ -490,10 +474,12 @@ const bolumSayisi = bilinenVar ? "beş" : "dört";
   }
   let etiketZamanlayicilar: number[] = [];
   // Bölüm 2 ve 4: her kutu kendi ezgisi/ritmi boyunca soldan sağa dolar (ilerleme çubuğu)
+  // Yalnız yazıyı değiştir: innerHTML ile kurulan eleman Astro'nun kapsamlı stilini (.kt-dolgu) almaz
   function gostergeEtiket(ad: string) {
     ([1, 2] as const).forEach((h) => {
       const el = document.querySelector<HTMLElement>(`[data-q-gosterge] [data-g="${h}"]`)!;
-      el.innerHTML = `<span class="kt-dolgu">${h}. ${ad}</span>${h}. ${ad}`;
+      el.querySelector(".kt-dolgu")!.textContent = `${h}. ${ad}`;
+      el.lastChild!.textContent = `${h}. ${ad}`;
     });
   }
   const dolgu = (hangi: 1 | 2) =>
@@ -526,7 +512,7 @@ const bolumSayisi = bilinenVar ? "beş" : "dört";
     const ikili = bolum === 2 || bolum === 4;
     ($("[data-q-gosterge]") as HTMLElement).hidden = !ikili;
     if (ikili) gostergeEtiket(bolum === 2 ? "ezgi" : "ritim");
-    $("[data-q-calan]").textContent = bolum === 2 ? "" : "Çalıyor"; // bölüm 4: sayma tıkları sırasında da
+    $("[data-q-calan]").textContent = ikili ? "" : "Çalıyor";
     gostergeSifirla();
     void dolgu(1).offsetWidth; // sıfırlamanın geçişsiz uygulanması için
     const sure = sorular[sira].cal();
