@@ -265,8 +265,9 @@ const bolumSayisi = bilinenVar ? "beş" : "dört";
         dogru: yon,
         cal: () => {
           const t = ctx!.currentTime + 0.1;
-          nota(ilk, t, 1.4); // Ars: ilk nota çalmaya devam ederken ikinci 0,5 sn sonra
-          nota(ikinci, t + 0.5, 1.4);
+          // 60 bpm, her nota 1 vuruş, üst üste binmez (İstemi; Ars'ta ikinci nota 0,5 sn sonra, ilki çalarken)
+          nota(ilk, t, 0.95);
+          nota(ikinci, t + 1, 0.95);
           return 2.0;
         },
       };
